@@ -38,7 +38,8 @@ class ObjectDetection:
 
     # akazeはグレースケールでマッチングさせるので色で判別できないので注意
     # ratio testで振り分ける方を採用(今後は一番いい順と組み合わせて精度上げたい)
-    def __match_img_akaze(self, query_img_path: str, train_img_path: str, ratio=0.5) -> list:
+    def __match_img_akaze(self, query_img_path: str, train_img_path: str, ratio=0.5,
+                          save_img=[False, "mif.png"]) -> list:
         result = self.__match_knn_akaze(query_img_path, train_img_path)
 
         good = []
@@ -48,15 +49,32 @@ class ObjectDetection:
 
         good = sorted(good, key=lambda x: x.distance)
 
+        if save_img[0]:
+            self.__save_match_feature_img(cv2.imread(query_img_path, 1), result[1], cv2.imread(train_img_path, 1),
+                                          result[3], good, save_img[1])
+
         coordinate = []
         for elem in good:
             coordinate.append(result[1][elem.queryIdx].pt)
 
         return coordinate
 
+    def __save_match_feature_img(self, img1, kp1, img2, kp2, match_obj, save_path):
+        match_img = cv2.drawMatches(img1, kp1, img2, kp2, match_obj[:10], None, flags=2)
+        cv2.imwrite(save_path, match_img)
+
+    def __save_match_template_img(self, img1, img2, loc, save_path):
+        s, w, h = img2.shape[::-1]
+        img = img1.copy()
+
+        for pt in zip(*loc[::-1]):
+            cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 255, 0), 2)
+
+        cv2.imwrite(save_path, img)
+
     def match_img_feature(self, query_img_path: str, train_img_path: str, threshold=4, sample_num=20,
-                          ratio=0.5, save_img=[False, "imgs/mif.png"]) -> list:
-        mr = self.__match_img_akaze(query_img_path, train_img_path, ratio)[:sample_num]
+                          ratio=0.5, save_img=[False, "mif.png"]) -> list:
+        mr = self.__match_img_akaze(query_img_path, train_img_path, ratio, save_img=save_img)[:sample_num]
 
         # もっとましな方法あるはずだから要検討
         # 高精度でマッチングした点が4以上であれば処理をする
@@ -68,12 +86,13 @@ class ObjectDetection:
             result = list(
                 filter(lambda x: np.abs(r_average[0] - x[0]) < r_std[0] and np.abs(r_average[1] - x[1]) < r_std[1], mr))
 
-            return [True, np.average(np.array(result), axis=0).tolist]
+            return [True, np.average(np.array(result), axis=0).tolist()]
         else:
             return [False, [None, None]]
 
     # ここに画像のセーブ機能をマージしてしまう <- 頭悪い設計
-    def match_img_template(self, query_img_path: str, train_img_path: str, threshold=0.8) -> list:
+    def match_img_template(self, query_img_path: str, train_img_path: str, threshold=0.8,
+                           save_img=[False, "mit.png"]) -> list:
         img1 = cv2.imread(query_img_path, 1)
         img2 = cv2.imread(train_img_path, 1)
 
@@ -92,24 +111,16 @@ class ObjectDetection:
         coordinate[0] = coordinate[0] + (w / 2.0)
         coordinate[1] = coordinate[1] + (h / 2.0)
 
+        if save_img[0]:
+            self.__save_match_template_img(img1, img2, loc, save_img[1])
+
         return [True, coordinate]
-
-        ### debug 表示のプロトコル
-        # img = img1.copy()
-        # print(np.average(loc, axis=1))
-
-        # for pt in zip(*loc[::-1]):
-        #    #print(pt)
-        #    cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 0), 1)
-
-        # cv2.imshow("align", img)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
-        #####
 
 
 # debug
 if __name__ == '__main__':
     od = ObjectDetection()
-    cd = od.match_img_template("img/screenshot.png", "img/screenshot6.png")
+    cd = od.match_img_template("img/screenshot.png", "img/screenshot3.png", save_img=[True, "tinko.png"])
     print(cd)
+    mf = od.match_img_feature("img/screenshot.png", "img/screenshot3.png", save_img=[True, "tintin.png"])
+    print(mf)
