@@ -55,7 +55,7 @@ class ObjectDetection:
         return coordinate
 
     def match_img_feature(self, query_img_path: str, train_img_path: str, threshold=4, sample_num=20,
-                          ratio=0.5) -> list:
+                          ratio=0.5, save_img=[False, "imgs/mif.png"]) -> list:
         mr = self.__match_img_akaze(query_img_path, train_img_path, ratio)[:sample_num]
 
         # もっとましな方法あるはずだから要検討
@@ -77,18 +77,39 @@ class ObjectDetection:
         img1 = cv2.imread(query_img_path, 1)
         img2 = cv2.imread(train_img_path, 1)
 
-        s, w, h = img2.sharp[::-1]
+        s, w, h = img2.shape[::-1]
         # TM_CCOEFF_NORMED(相関係数法(正規化))が一番精度いいらしい, 他には相互関数, 最小二乗法等がある
         # 予測精度は1に近いほどよい(最小二乗法は0に近いほうがよい)
         res = cv2.matchTemplate(img1, img2, cv2.TM_CCOEFF_NORMED)
 
         loc = np.where(res >= threshold)
-        # debug
-        img = img0.copy()
+        if loc[0].size == 0:
+            return [False, [None, None]]
+
+        coordinate = np.average(loc, axis=1).tolist()
+        coordinate.reverse()
+
+        coordinate[0] = coordinate[0] + (w / 2.0)
+        coordinate[1] = coordinate[1] + (h / 2.0)
+
+        return [True, coordinate]
+
+        ### debug 表示のプロトコル
+        # img = img1.copy()
+        # print(np.average(loc, axis=1))
+
+        # for pt in zip(*loc[::-1]):
+        #    #print(pt)
+        #    cv2.rectangle(img, pt, (pt[0] + w, pt[1] + h), (0, 0, 0), 1)
+
+        # cv2.imshow("align", img)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+        #####
+
 
 # debug
 if __name__ == '__main__':
     od = ObjectDetection()
-    cd = od.match_img_feature("img/screenshot.png", "img/screenshot3.png")
-    for elem in cd:
-        print(elem)
+    cd = od.match_img_template("img/screenshot.png", "img/screenshot6.png")
+    print(cd)
