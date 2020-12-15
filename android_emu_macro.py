@@ -26,14 +26,22 @@ class AndroidEmuMacro:
     def restart(self) -> None:
         self.__aw.restart()
 
-    def __match_ing(self, train_img_path: str) -> list:
+    # 特徴量でマッチング
+    def __match_feature(self, train_img_path: str):
         self.screenshot(0)
-        obj = self.__od.match_img(self.__save_img_path + "/screenshot0.png", train_img_path)
+        obj = self.__od.__match_img_akaze(self.__save_img_path + "/screenshot0.png", train_img_path)
         return obj
 
+    # テンプレートマッチング
+    def __match_template(self, train_img_path: str):
+        self.screenshot(0)
+        obj = []
+        return obj
+
+    # このメソッドをテンプレートマッチングと, 特徴量検知で分ける
     def get_img_coordinate(self, train_img_path: str, threshold=4, sample_num=20) -> list or None:
         result = None
-        mr = self.__match_ing(train_img_path)[:sample_num]
+        mr = self.__match_feature(train_img_path)[:sample_num]
 
         # 高精度でマッチングした点が4以上であれば処理をする
         if len(mr) >= threshold:
@@ -51,6 +59,7 @@ class AndroidEmuMacro:
     def is_there_img(self, train_img_path: str, threshold=4, sample_num=20) -> bool:
         return not (self.get_img_coordinate(train_img_path, threshold, sample_num) is None)
 
+    # 精度あやしい
     def tap_img(self, train_img_path: str, threshold=4, sample_num=20) -> bool:
         coordinate = self.get_img_coordinate(train_img_path, threshold, sample_num)
         if coordinate is None:
@@ -85,8 +94,12 @@ class AndroidEmuMacro:
         self.__aw.swipe(x1, y1, x2, y2, m_sec)
 
     @staticmethod
-    def sleep_ms(m_sec) -> None:
-        time.sleep(float(m_sec / 1000))
+    def sleep(sec: float) -> None:
+        time.sleep(sec)
+
+    @staticmethod
+    def sleep_ms(m_sec: float) -> None:
+        time.sleep(m_sec / 1000.0)
 
     def screenshot(self, offset=1) -> None:
         while os.path.isfile(self.__save_img_path + "/screenshot" + str(offset) + ".png") and (offset != 0):
@@ -94,13 +107,40 @@ class AndroidEmuMacro:
 
         self.__aw.screenshot(self.__save_img_path, "/screenshot" + str(offset) + ".png")
 
-    def save_recognition_range(self, save_path="./match_img.png", display_num=20) -> None:
-        self.__od.save_match_img(save_path, display_num)
 
-
+# add df test
+# 特徴抽出は使える場合と死ぬ場合が極端だからパターンマッチングも実装しとく
 if __name__ == '__main__':
     aem = AndroidEmuMacro()
     aem.connect()
-    print(aem.tap_img("./img/screenshot3.png"))
-    aem.swipe(450, 450, 900, 900)
+
+    # macro
+    aem.tap_img("df/sento.png")
+    aem.sleep_ms(5000)
+
+    aem.tap_img("df/mogi.png")
+    aem.sleep_ms(5000)
+
+    aem.tap_img("df/mogi_t.png")
+    aem.sleep_ms(5000)
+
+    c = aem.get_img_coordinate("df/mogi_ct_y_900.png")
+    if c is None:
+        print("ken ti de kizu")
+        exit()
+    aem.tap(c[0], 900)
+    aem.sleep_ms(5000)
+
+    aem.tap_img("df/tyosen.png")
+    aem.save_recognition_range("img/d5.png")
+    aem.sleep(10)
+
+    # aem.tap_img("df/modoru.png")
+    aem.tap_img("df/modoru.png")
+    aem.sleep_ms(5000)
+
+    aem.tap_img("df/modoru_2.png")
+    aem.sleep_ms(5000)
+    # end macro
+
     aem.disconnect()
