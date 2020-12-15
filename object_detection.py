@@ -3,13 +3,12 @@ import numpy as np
 
 
 class ObjectDetection:
-    def __init__(self):
-        pass
 
     # ここに画像のセーブ機能をマージしてしまう
     # てか保持してるフィールドを減らす
     # まず,　フィールドを整理する
-    def __pre_calc_akaze(self, query_img_path: str, train_img_path: str) -> list:
+    @staticmethod
+    def __pre_calc_akaze(query_img_path: str, train_img_path: str) -> list:
         gray1 = cv2.imread(query_img_path, 0)
         gray2 = cv2.imread(train_img_path, 0)
 
@@ -59,11 +58,14 @@ class ObjectDetection:
 
         return coordinate
 
-    def __save_match_feature_img(self, img1, kp1, img2, kp2, match_obj, save_path):
+    @staticmethod
+    def __save_match_feature_img(img1, kp1, img2, kp2, match_obj, save_path):
         match_img = cv2.drawMatches(img1, kp1, img2, kp2, match_obj[:10], None, flags=2)
+        # match_img = cv2.drawMatches(img1, kp1, img2, kp2, match_obj, None, flags=2)
         cv2.imwrite(save_path, match_img)
 
-    def __save_match_template_img(self, img1, img2, loc, save_path):
+    @staticmethod
+    def __save_match_template_img(img1, img2, loc, save_path):
         s, w, h = img2.shape[::-1]
         img = img1.copy()
 
@@ -90,6 +92,8 @@ class ObjectDetection:
         else:
             return [False, [None, None]]
 
+    # 複数個検知なんてもんはない()
+    # 複数個発見した場合にすべての座標を返すように変更する
     # ここに画像のセーブ機能をマージしてしまう <- 頭悪い設計
     def match_img_template(self, query_img_path: str, train_img_path: str, threshold=0.8,
                            save_img=[False, "mit.png"]) -> list:
@@ -120,7 +124,7 @@ class ObjectDetection:
 # debug
 if __name__ == '__main__':
     od = ObjectDetection()
-    cd = od.match_img_template("img/screenshot.png", "img/screenshot3.png", save_img=[True, "tinko.png"])
+    cd = od.match_img_template("img/s2.png", "img/s1.png", save_img=[True, "tinko.png"])
     print(cd)
-    mf = od.match_img_feature("img/screenshot.png", "img/screenshot3.png", save_img=[True, "tintin.png"])
+    mf = od.match_img_feature("img/s2.png", "img/s1.png", save_img=[True, "tintin.png"])
     print(mf)
