@@ -9,6 +9,11 @@ class ObjectDetection:
     # まず,　フィールドを整理する
     @staticmethod
     def __pre_calc_akaze(query_img_path: str, train_img_path: str) -> list:
+        # 正規化処理もあるっぽいけど精度おちる...
+        gamma22LUT = np.array([pow(x / 255.0, 2.2) for x in range(256)],
+                              dtype='float32')
+        #gray1 = cv2.LUT(cv2.imread(query_img_path), gamma22LUT)
+        #gray2 = cv2.LUT(cv2.imread(train_img_path), gamma22LUT)
         gray1 = cv2.imread(query_img_path, 0)
         gray2 = cv2.imread(train_img_path, 0)
 
@@ -31,7 +36,11 @@ class ObjectDetection:
     def __match_knn_akaze(self, query_img_path: str, train_img_path: str) -> list:
         kp1, des1, kp2, des2 = self.__pre_calc_akaze(query_img_path, train_img_path)
         bf = cv2.BFMatcher_create(cv2.NORM_HAMMING)
-        matches = bf.knnMatch(des1, des2, 2)
+
+        # 下流のdes2が輝度不足でNoneになって全部死ぬのどうにかしないとx
+        matches = None
+        if des2 is not None:
+            matches = bf.knnMatch(des1, des2, 2)
 
         return [matches, kp1, des1, kp2, des2]
 
@@ -42,6 +51,8 @@ class ObjectDetection:
         result = self.__match_knn_akaze(query_img_path, train_img_path)
 
         good = []
+        if result[0] is None:
+            return []
         for m, n in result[0]:
             if m.distance < ratio * n.distance:
                 good.append(m)
@@ -124,7 +135,7 @@ class ObjectDetection:
 # debug
 if __name__ == '__main__':
     od = ObjectDetection()
-    cd = od.match_img_template("img/s2.png", "img/s1.png", save_img=[True, "tinko.png"])
+    cd = od.match_img_template("img/screenshot.png", "img/screenshot6.png", save_img=[True, "tinko.png"])
     print(cd)
-    mf = od.match_img_feature("img/s2.png", "img/s1.png", save_img=[True, "tintin.png"])
+    mf = od.match_img_feature("img/screenshot.png", "img/screenshot6.png", save_img=[True, "tintin.png"])
     print(mf)
