@@ -12,8 +12,8 @@ class ObjectDetection:
         # 正規化処理もあるっぽいけど精度おちる...
         gamma22LUT = np.array([pow(x / 255.0, 2.2) for x in range(256)],
                               dtype='float32')
-        #gray1 = cv2.LUT(cv2.imread(query_img_path), gamma22LUT)
-        #gray2 = cv2.LUT(cv2.imread(train_img_path), gamma22LUT)
+        # gray1 = cv2.LUT(cv2.imread(query_img_path), gamma22LUT)
+        # gray2 = cv2.LUT(cv2.imread(train_img_path), gamma22LUT)
         gray1 = cv2.imread(query_img_path, 0)
         gray2 = cv2.imread(train_img_path, 0)
 
@@ -48,7 +48,13 @@ class ObjectDetection:
     # ratio testで振り分ける方を採用(今後は一番いい順と組み合わせて精度上げたい)
     def __match_img_akaze(self, query_img_path: str, train_img_path: str, ratio=0.5,
                           save_img=[False, "mif.png"]) -> list:
-        result = self.__match_knn_akaze(query_img_path, train_img_path)
+        result = [None, None]
+        # くそみてぇな例外の握り潰しになってるから
+        # 今後, 輝度が足りねぇ時に画像を加工するコードを追加するように
+        try:
+            result = self.__match_knn_akaze(query_img_path, train_img_path)
+        except:
+            pass
 
         good = []
         if result[0] is None:
@@ -135,7 +141,7 @@ class ObjectDetection:
 # debug
 if __name__ == '__main__':
     od = ObjectDetection()
-    cd = od.match_img_template("img/screenshot.png", "img/screenshot6.png", save_img=[True, "tinko.png"])
+    cd = od.match_img_template("imgs/screenshot18.png", "df_img/h_koho.png", save_img=[True, "tinko.png"])
     print(cd)
-    mf = od.match_img_feature("img/screenshot.png", "img/screenshot6.png", save_img=[True, "tintin.png"])
+    mf = od.match_img_feature("imgs/screenshot18.png", "img/h_koho.png", save_img=[True, "tintin.png"])
     print(mf)
