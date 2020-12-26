@@ -1,12 +1,13 @@
 arc.py
-img
+img/
 screenshot1.png
 match_img.png
 arc.py
 *.png
 __pycache__
 .idea
-df
+df/
 tinko.png
 tintin.png
 gf_core_10.5.3.2.py
+note.txt
