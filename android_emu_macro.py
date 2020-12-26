@@ -128,11 +128,6 @@ class AndroidEmuMacro:
 if __name__ == '__main__':
     aem = AndroidEmuMacro()
     aem.connect()
-
-    # 遠征後, クリック回数2 (1111,745->でうまくっぽい)
-
-    # macro
+    # スクショとるコード
     aem.screenshot()
-    #print(aem.is_there_img("img/screenshot3.png"))
-    # end macro
     aem.disconnect()
