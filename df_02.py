@@ -22,7 +22,7 @@ def check_logistic_support(aem: AndroidEmuMacro) -> bool:
     return result
 
 
-# 未検証
+# うごく
 # 獲得キャラをすべて分解
 def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
     if __go_b2factory(aem):
@@ -37,14 +37,46 @@ def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
     return False
 
 
+# うごく
+# 作戦報告書を作る
+def make_fd(aem: AndroidEmuMacro) -> bool:
+    __go_b2factory(aem)
+    __open_multi_menu(aem)
+    aem.sleep(5.0)
+    __go_m2dataroom(aem)
+    aem.sleep(10)
+
+    # ここに報告書作るコードいれろ
+    if __make_fd(aem):
+        __return_base(aem)
+        return True
+    else:
+        __return_base(aem)
+        return False
+
+
 ###################################################
 # 以下下層の実装
 ###################################################
 
+# TODO スリープ処理を排除して, その処理は上層にやらせるよう書きなおす
+
+# たぶんうごく
+# マルチメニューをひらく
+def __open_multi_menu(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/multi_menu.png")
+
+
+# うごく
+# マルチメニューからデータルームに飛ぶ
+def __go_m2dataroom(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/mm_dr.png")
+
+
 # いちおううごく
 # まるちめにゅー？からベースに移動
 def __return_base(aem: AndroidEmuMacro) -> bool:
-    if aem.tap_img("df_img/multi_menu.png"):
+    if __open_multi_menu(aem):
         aem.sleep(5)
         if aem.tap_img("df_img/return_base.png"):
             aem.sleep(10)
@@ -99,12 +131,30 @@ def __disassemble(aem: AndroidEmuMacro) -> bool:
     return False
 
 
+# うごく
+# キャラ選択画面へ移行
 def __enter_select_char(aem: AndroidEmuMacro) -> bool:
     aem.tap_img("df_img/da_select_char.png")
     aem.sleep(1.0)
     if aem.is_there_img("df_img/da_.png"):
         return False
     return True
+
+
+# うごく
+# データルーム内からフロッピーディスクを作る
+def __make_fd(aem: AndroidEmuMacro) -> bool:
+    if aem.tap_img("df_img/dr_dk.png"):
+        aem.sleep(0.1)
+        aem.tap_img("df_img/dr_dk_start.png")
+        aem.sleep(0.1)
+        if aem.tap_img("df_img/dr_dk_apply.png"):
+            return True
+        else:
+            aem.sleep(0.1)
+            aem.tap_img("df_img/dr_dk_bk.png")
+
+    return False
 
 
 if __name__ == '__main__':
@@ -122,7 +172,9 @@ if __name__ == '__main__':
         # return_base(aem)
         # __select_char(aem)
         # __select_disassemble(aem)
-        print(disassemble_all_char(aem))
+        # print(disassemble_all_char(aem))
+        print(make_fd(aem))
+
         pass
     except KeyboardInterrupt:
         aem.disconnect()
