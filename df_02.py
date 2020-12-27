@@ -92,6 +92,19 @@ def change_attacker(aem: AndroidEmuMacro, is_formation_1: bool) -> bool:
     return result
 
 
+# 0-2に侵入するコード
+def go_02(aem: AndroidEmuMacro) -> bool:
+    result = False
+    if __go_b2combat(aem):
+        aem.sleep(load_maximum)
+        if __select_02(aem):
+            aem.sleep(load_medium)
+            result = aem.tap_img("df_img/cbt_apply.png")
+            aem.sleep(load_maximum)
+
+    return result
+
+
 ###################################################
 # 以下下層の実装
 ###################################################
@@ -115,6 +128,11 @@ def __return_base(aem: AndroidEmuMacro) -> bool:
         aem.sleep(load_medium)
         return aem.tap_img("df_img/return_base.png")
     return False
+
+
+# ベースto戦闘
+def __go_b2combat(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/b_cbt.png")
 
 
 # うごく
@@ -183,6 +201,11 @@ def __select_char(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/sc_apply.png")
 
 
+# TODO ずれてたときに修正するコード追加したほうがいいかも
+def __select_02(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/cbt_02.png")
+
+
 # うごく
 # 分解の解体ボタンをおす
 def __disassemble(aem: AndroidEmuMacro) -> bool:
@@ -245,7 +268,7 @@ if __name__ == '__main__':
         # print(make_fd(aem))
         # print(change_attacker(aem, True))
         # print(change_attacker(aem, False))
-        __go_b2ef(aem)
+        go_02(aem)
         pass
     except KeyboardInterrupt:
         aem.disconnect()
