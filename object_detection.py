@@ -37,7 +37,7 @@ class ObjectDetection:
         kp1, des1, kp2, des2 = self.__pre_calc_akaze(query_img_path, train_img_path)
         bf = cv2.BFMatcher_create(cv2.NORM_HAMMING)
 
-        # 下流のdes2が輝度不足でNoneになって全部死ぬのどうにかしないとx
+        # TODO 下流のdes2が輝度不足でNoneになって全部死ぬのどうにかしないとx
         matches = None
         if des2 is not None:
             matches = bf.knnMatch(des1, des2, 2)
@@ -50,7 +50,7 @@ class ObjectDetection:
                           save_img=[False, "mif.png"]) -> list:
         result = [None, None]
         # くそみてぇな例外の握り潰しになってるから
-        # 今後, 輝度が足りねぇ時に画像を加工するコードを追加するように
+        # TODO 今後, 輝度が足りねぇ時に画像を加工するコードを追加するように
         try:
             result = self.__match_knn_akaze(query_img_path, train_img_path)
         except:
@@ -59,9 +59,16 @@ class ObjectDetection:
         good = []
         if result[0] is None:
             return []
-        for m, n in result[0]:
-            if m.distance < ratio * n.distance:
-                good.append(m)
+
+        # resultによくわからんゴミが混ざってここを通過しちまう場合があってその例外を書いてる
+        # とりあえずそういう場合は失敗ってことにしてしまう
+        # TODO 得体の知れない返り値の解析をやる
+        try:
+            for m, n in result[0]:
+                if m.distance < ratio * n.distance:
+                    good.append(m)
+        except:
+            return []
 
         good = sorted(good, key=lambda x: x.distance)
 
@@ -95,7 +102,7 @@ class ObjectDetection:
                           ratio=0.5, save_img=[False, "mif.png"]) -> list:
         mr = self.__match_img_akaze(query_img_path, train_img_path, ratio, save_img=save_img)[:sample_num]
 
-        # もっとましな方法あるはずだから要検討
+        # TODO もっとましな方法あるはずだから要検討
         # 高精度でマッチングした点が4以上であれば処理をする
         if len(mr) >= threshold:
             r_std = np.std(np.array(mr), axis=0)
@@ -110,7 +117,7 @@ class ObjectDetection:
             return [False, [None, None]]
 
     # 複数個検知なんてもんはない()
-    # 複数個発見した場合にすべての座標を返すように変更する
+    # TODO 複数個発見した場合にすべての座標を返すように変更する
     # ここに画像のセーブ機能をマージしてしまう <- 頭悪い設計
     def match_img_template(self, query_img_path: str, train_img_path: str, threshold=0.8,
                            save_img=[False, "mit.png"]) -> list:
