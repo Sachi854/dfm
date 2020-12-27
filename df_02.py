@@ -16,9 +16,9 @@ def check_logistic_support(aem: AndroidEmuMacro) -> bool:
     while aem.is_there_img("df_img/b_ls.png"):
         result = True
         aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
-        aem.sleep(1)
+        aem.sleep(1.0)
         aem.tap_img("df_img/b_ls_apply.png")
-        aem.sleep(10)
+        aem.sleep(10.0)
     return result
 
 
@@ -26,13 +26,16 @@ def check_logistic_support(aem: AndroidEmuMacro) -> bool:
 # 獲得キャラをすべて分解
 def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
     if __go_b2factory(aem):
+        aem.sleep(8.0)
         __go_ft2retire(aem)
+        aem.sleep(2.0)
         while __enter_select_char(aem):
             __select_char(aem)
             aem.sleep(0.2)
             __disassemble(aem)
             aem.sleep(1.0)
         __return_base(aem)
+        aem.sleep(10.0)
         return True
     return False
 
@@ -41,17 +44,20 @@ def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
 # 作戦報告書を作る
 def make_fd(aem: AndroidEmuMacro) -> bool:
     __go_b2factory(aem)
+    aem.sleep(8.0)
     __open_multi_menu(aem)
-    aem.sleep(5.0)
+    aem.sleep(2.0)
     __go_m2dataroom(aem)
-    aem.sleep(10)
+    aem.sleep(10.0)
 
     # ここに報告書作るコードいれろ
     if __make_fd(aem):
         __return_base(aem)
+        aem.sleep(10.0)
         return True
     else:
         __return_base(aem)
+        aem.sleep(10.0)
         return False
 
 
@@ -78,28 +84,20 @@ def __go_m2dataroom(aem: AndroidEmuMacro) -> bool:
 def __return_base(aem: AndroidEmuMacro) -> bool:
     if __open_multi_menu(aem):
         aem.sleep(5)
-        if aem.tap_img("df_img/return_base.png"):
-            aem.sleep(10)
-            return True
+        return aem.tap_img("df_img/return_base.png")
     return False
 
 
 # うごく
 # ベースから工廠へ移動
 def __go_b2factory(aem: AndroidEmuMacro) -> bool:
-    if aem.tap_img("df_img/b_ft.png"):
-        aem.sleep(10)
-        return True
-    return False
+    return aem.tap_img("df_img/b_ft.png")
 
 
 # うごく
 # 工廠から回収分解に移動
 def __go_ft2retire(aem: AndroidEmuMacro) -> bool:
-    if aem.tap_img("df_img/ft_da.png"):
-        aem.sleep(5)
-        return True
-    return False
+    return aem.tap_img("df_img/ft_da.png")
 
 
 # うごく
@@ -144,17 +142,23 @@ def __enter_select_char(aem: AndroidEmuMacro) -> bool:
 # うごく
 # データルーム内からフロッピーディスクを作る
 def __make_fd(aem: AndroidEmuMacro) -> bool:
+    result = False
     if aem.tap_img("df_img/dr_dk.png"):
         aem.sleep(0.1)
         aem.tap_img("df_img/dr_dk_start.png")
         aem.sleep(0.1)
         if aem.tap_img("df_img/dr_dk_apply.png"):
-            return True
-        else:
+            result = True
+            if aem.is_there_img("df_img/dr_dk_apply.png"):
+                aem.sleep(0.1)
+                aem.tap_img("df_img/dr_dk_cancel.png")
+                result = False
+
+        if not result:
             aem.sleep(0.1)
             aem.tap_img("df_img/dr_dk_bk.png")
 
-    return False
+    return result
 
 
 if __name__ == '__main__':
@@ -172,7 +176,7 @@ if __name__ == '__main__':
         # return_base(aem)
         # __select_char(aem)
         # __select_disassemble(aem)
-        # print(disassemble_all_char(aem))
+        print(disassemble_all_char(aem))
         print(make_fd(aem))
 
         pass
@@ -182,4 +186,6 @@ if __name__ == '__main__':
 
     # デバッグ用に用意, リリース時は削除するように
     aem.disconnect()
+    print("==========================")
     print("周回を終了")
+    print("==========================")
