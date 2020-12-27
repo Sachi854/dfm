@@ -18,6 +18,7 @@ load_minimum = 0.4
 # 後方支援処理
 def check_logistic_support(aem: AndroidEmuMacro) -> bool:
     result = False
+    # 後方支援が帰ってるか判定
     while aem.is_there_img("df_img/b_ls.png"):
         result = True
         aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
@@ -30,15 +31,21 @@ def check_logistic_support(aem: AndroidEmuMacro) -> bool:
 # うごく
 # 獲得キャラをすべて分解
 def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
+    # ベースから工廠へ
     if __go_b2factory(aem):
         aem.sleep(load_maximum)
+        # 分解の画面へ
         __go_ft2retire(aem)
         aem.sleep(load_medium)
+        # 分解できるキャラがいればキャラ選択へ
         while __enter_select_char(aem):
+            # キャラ選択とばらすボタンオス処理
             __select_char(aem)
             aem.sleep(load_minimum)
             __disassemble(aem)
             aem.sleep(load_medium)
+
+        # ベースへ
         __return_base(aem)
         aem.sleep(load_maximum)
         return True
@@ -48,6 +55,7 @@ def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
 # うごく
 # 作戦報告書を作る
 def make_fd(aem: AndroidEmuMacro) -> bool:
+    # 工廠->マルチメニュー経由でデータルームへ
     __go_b2factory(aem)
     aem.sleep(load_maximum)
     __open_multi_menu(aem)
@@ -55,7 +63,7 @@ def make_fd(aem: AndroidEmuMacro) -> bool:
     __go_m2dataroom(aem)
     aem.sleep(load_maximum)
 
-    # ここに報告書作るコードいれろ
+    # フロッピー作る処理
     if __make_fd(aem):
         __return_base(aem)
         aem.sleep(load_maximum)
@@ -71,13 +79,21 @@ def make_fd(aem: AndroidEmuMacro) -> bool:
 # アタッカーの入れ替え
 def change_attacker(aem: AndroidEmuMacro, is_formation_1: bool) -> bool:
     result = False
+    # ベースから部隊編集へ
     if __go_b2ef(aem):
         aem.sleep(load_maximum)
+
+        # 2部隊を選択
+        __select_echelon_2(aem)
+        aem.sleep(load_medium)
+
+        # 陣形編集へ
         __go_ef2form(aem)
         aem.sleep(load_medium)
         __go_form2cfm(aem)
         aem.sleep(load_medium)
 
+        # プリセット入れ替え
         if is_formation_1:
             result = __select_formation(aem, "df_img/ef2.png")
         else:
@@ -86,6 +102,12 @@ def change_attacker(aem: AndroidEmuMacro, is_formation_1: bool) -> bool:
         aem.sleep(load_medium)
         __go_form2ef(aem)
         aem.sleep(load_medium)
+
+        # 2部隊と1部隊を交換するコードを追加
+        result = __change_e2_to_e1(aem)
+        aem.sleep(load_medium)
+
+        # ベースへ
         __return_base(aem)
         aem.sleep(load_maximum)
 
@@ -95,14 +117,24 @@ def change_attacker(aem: AndroidEmuMacro, is_formation_1: bool) -> bool:
 # 0-2に侵入するコード
 def go_02(aem: AndroidEmuMacro) -> bool:
     result = False
+    # 戦役選択画面へ
     if __go_b2combat(aem):
         aem.sleep(load_maximum)
+        # 02があったら押す
         if __select_02(aem):
             aem.sleep(load_medium)
             result = aem.tap_img("df_img/cbt_apply.png")
             aem.sleep(load_maximum)
 
     return result
+
+
+# 0-2で周回を行うコード
+# return
+# 1. is finishing this func : bool
+# 2. is exp full : bool
+def do_combat_02(aes: AndroidEmuMacro) -> list:
+    pass
 
 
 ###################################################
@@ -157,21 +189,6 @@ def __go_form2cfm(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/f_fc.png")
 
 
-# 陣形プリセット選択
-def __select_formation(aem: AndroidEmuMacro, img_path: str) -> bool:
-    result = False
-    if aem.tap_img(img_path):
-        aem.sleep(load_medium)
-        result = aem.tap_img("df_img/fc_apply.png")
-        aem.sleep(load_medium)
-        if aem.tap_img("df_img/fc_x.png"):
-            aem.sleep(load_minimum)
-            aem.tap_img("df_img/fc_x_apply.png")
-            aem.sleep(load_minimum)
-
-    return result
-
-
 # 部隊編成へ戻る
 def __go_form2ef(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/f_apply.png")
@@ -181,6 +198,26 @@ def __go_form2ef(aem: AndroidEmuMacro) -> bool:
 # 工廠から回収分解に移動
 def __go_ft2retire(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/ft_da.png")
+
+
+# 部隊選択
+def __select_echelon_2(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/e2_fix.png")
+
+
+# 陣形プリセット選択
+def __select_formation(aem: AndroidEmuMacro, img_path: str) -> bool:
+    result = False
+    if aem.tap_img(img_path):
+        aem.sleep(load_medium)
+        result = aem.tap_img("df_img/fc_apply.png")
+        aem.sleep(load_medium)
+        if aem.tap_img("df_img/fc_x.png") or aem.is_there_img("df_img/fc_v.png"):
+            aem.sleep(load_minimum)
+            aem.tap_img("df_img/fc_x_apply.png")
+            aem.sleep(load_minimum)
+
+    return result
 
 
 # うごく
@@ -202,8 +239,20 @@ def __select_char(aem: AndroidEmuMacro) -> bool:
 
 
 # TODO ずれてたときに修正するコード追加したほうがいいかも
+# 0-2を選択
 def __select_02(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/cbt_02.png")
+
+
+# 部隊2と部隊1を交換
+def __change_e2_to_e1(aem: AndroidEmuMacro) -> bool:
+    flag, pos = aem.match("df_img/e1_fix.png")
+    if flag:
+        aem.swipe_img("df_img/e2_active_fix.png", pos[0], pos[1], 1000)
+        aem.sleep(load_medium)
+        aem.tap_img("df_img/e_apply.png")
+
+    return flag
 
 
 # うごく
@@ -267,8 +316,14 @@ if __name__ == '__main__':
         # print(disassemble_all_char(aem))
         # print(make_fd(aem))
         # print(change_attacker(aem, True))
-        # print(change_attacker(aem, False))
-        go_02(aem)
+        # __change_e2_to_e1(aem)
+        print(change_attacker(aem, False))
+        # __select_echelon_2(aem)
+        # go_02(aem)
+        # while True:
+        #     check_logistic_support(aem)
+        #     print("manjyu~~~~")
+        #     aem.sleep(300)
         pass
     except KeyboardInterrupt:
         aem.disconnect()
