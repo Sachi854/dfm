@@ -1,10 +1,15 @@
 from android_emu_macro import AndroidEmuMacro
 import random
 
-
 ###################################################
 # 使うならこのレベルのAPIがいいとおもう
 ###################################################
+
+# 待機時間を一応書いておく
+load_maximum = 8.0
+load_medium = 2.0
+load_minimum = 0.4
+
 
 # ベースを基準に動かそうとおもう
 # まるちめにゅーっぽいやつは保留
@@ -16,9 +21,9 @@ def check_logistic_support(aem: AndroidEmuMacro) -> bool:
     while aem.is_there_img("df_img/b_ls.png"):
         result = True
         aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
-        aem.sleep(1.0)
+        aem.sleep(load_medium)
         aem.tap_img("df_img/b_ls_apply.png")
-        aem.sleep(10.0)
+        aem.sleep(load_maximum)
     return result
 
 
@@ -26,16 +31,16 @@ def check_logistic_support(aem: AndroidEmuMacro) -> bool:
 # 獲得キャラをすべて分解
 def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
     if __go_b2factory(aem):
-        aem.sleep(8.0)
+        aem.sleep(load_maximum)
         __go_ft2retire(aem)
-        aem.sleep(2.0)
+        aem.sleep(load_medium)
         while __enter_select_char(aem):
             __select_char(aem)
-            aem.sleep(0.2)
+            aem.sleep(load_minimum)
             __disassemble(aem)
-            aem.sleep(1.0)
+            aem.sleep(load_medium)
         __return_base(aem)
-        aem.sleep(10.0)
+        aem.sleep(load_maximum)
         return True
     return False
 
@@ -44,28 +49,52 @@ def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
 # 作戦報告書を作る
 def make_fd(aem: AndroidEmuMacro) -> bool:
     __go_b2factory(aem)
-    aem.sleep(8.0)
+    aem.sleep(load_maximum)
     __open_multi_menu(aem)
-    aem.sleep(2.0)
+    aem.sleep(load_medium)
     __go_m2dataroom(aem)
-    aem.sleep(10.0)
+    aem.sleep(load_maximum)
 
     # ここに報告書作るコードいれろ
     if __make_fd(aem):
         __return_base(aem)
-        aem.sleep(10.0)
+        aem.sleep(load_maximum)
         return True
     else:
         __return_base(aem)
-        aem.sleep(10.0)
+        aem.sleep(load_maximum)
         return False
+
+
+# TODO 戦闘に飛ぶ可能性があるっぽいから検証しとけ
+# あやしいけどうごく
+# アタッカーの入れ替え
+def change_attacker(aem: AndroidEmuMacro, is_formation_1: bool) -> bool:
+    result = False
+    if __go_b2ef(aem):
+        aem.sleep(load_maximum)
+        __go_ef2form(aem)
+        aem.sleep(load_medium)
+        __go_form2cfm(aem)
+        aem.sleep(load_medium)
+
+        if is_formation_1:
+            result = __select_formation(aem, "df_img/ef2.png")
+        else:
+            result = __select_formation(aem, "df_img/ef1.png")
+
+        aem.sleep(load_medium)
+        __go_form2ef(aem)
+        aem.sleep(load_medium)
+        __return_base(aem)
+        aem.sleep(load_maximum)
+
+    return result
 
 
 ###################################################
 # 以下下層の実装
 ###################################################
-
-# TODO スリープ処理を排除して, その処理は上層にやらせるよう書きなおす
 
 # たぶんうごく
 # マルチメニューをひらく
@@ -83,7 +112,7 @@ def __go_m2dataroom(aem: AndroidEmuMacro) -> bool:
 # まるちめにゅー？からベースに移動
 def __return_base(aem: AndroidEmuMacro) -> bool:
     if __open_multi_menu(aem):
-        aem.sleep(5)
+        aem.sleep(load_medium)
         return aem.tap_img("df_img/return_base.png")
     return False
 
@@ -92,6 +121,42 @@ def __return_base(aem: AndroidEmuMacro) -> bool:
 # ベースから工廠へ移動
 def __go_b2factory(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/b_ft.png")
+
+
+# うごく
+# ベースto部隊編成
+def __go_b2ef(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/b_ef.png")
+
+
+# 部隊編成to陣形編成
+def __go_ef2form(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/ef_f.png")
+
+
+# 陣形編成to陣形プリセット
+def __go_form2cfm(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/f_fc.png")
+
+
+# 陣形プリセット選択
+def __select_formation(aem: AndroidEmuMacro, img_path: str) -> bool:
+    result = False
+    if aem.tap_img(img_path):
+        aem.sleep(load_medium)
+        result = aem.tap_img("df_img/fc_apply.png")
+        aem.sleep(load_medium)
+        if aem.tap_img("df_img/fc_x.png"):
+            aem.sleep(load_minimum)
+            aem.tap_img("df_img/fc_x_apply.png")
+            aem.sleep(load_minimum)
+
+    return result
+
+
+# 部隊編成へ戻る
+def __go_form2ef(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/f_apply.png")
 
 
 # うごく
@@ -104,17 +169,17 @@ def __go_ft2retire(aem: AndroidEmuMacro) -> bool:
 # 人形を上一列選択
 def __select_char(aem: AndroidEmuMacro) -> bool:
     aem.tap(random.randrange(80, 230, 1), random.randrange(230, 460, 1))
-    aem.sleep(0.1)
+    aem.sleep(load_minimum)
     aem.tap(random.randrange(350, 500, 1), random.randrange(230, 460, 1))
-    aem.sleep(0.1)
+    aem.sleep(load_minimum)
     aem.tap(random.randrange(600, 750, 1), random.randrange(230, 460, 1))
-    aem.sleep(0.1)
+    aem.sleep(load_minimum)
     aem.tap(random.randrange(850, 1000, 1), random.randrange(230, 460, 1))
-    aem.sleep(0.1)
+    aem.sleep(load_minimum)
     aem.tap(random.randrange(1130, 1280, 1), random.randrange(230, 460, 1))
-    aem.sleep(0.1)
+    aem.sleep(load_minimum)
     aem.tap(random.randrange(1400, 1550, 1), random.randrange(230, 460, 1))
-    aem.sleep(0.1)
+    aem.sleep(load_minimum)
     return aem.tap_img("df_img/sc_apply.png")
 
 
@@ -122,9 +187,9 @@ def __select_char(aem: AndroidEmuMacro) -> bool:
 # 分解の解体ボタンをおす
 def __disassemble(aem: AndroidEmuMacro) -> bool:
     if aem.tap_img("df_img/da_apply.png"):
-        aem.sleep(0.5)
+        aem.sleep(load_minimum)
         while aem.tap_img("df_img/da_e_apply.png"):
-            aem.sleep(0.5)
+            aem.sleep(load_minimum)
         return True
     return False
 
@@ -133,7 +198,7 @@ def __disassemble(aem: AndroidEmuMacro) -> bool:
 # キャラ選択画面へ移行
 def __enter_select_char(aem: AndroidEmuMacro) -> bool:
     aem.tap_img("df_img/da_select_char.png")
-    aem.sleep(1.0)
+    aem.sleep(load_medium)
     if aem.is_there_img("df_img/da_.png"):
         return False
     return True
@@ -144,18 +209,18 @@ def __enter_select_char(aem: AndroidEmuMacro) -> bool:
 def __make_fd(aem: AndroidEmuMacro) -> bool:
     result = False
     if aem.tap_img("df_img/dr_dk.png"):
-        aem.sleep(0.1)
+        aem.sleep(load_minimum)
         aem.tap_img("df_img/dr_dk_start.png")
-        aem.sleep(0.1)
+        aem.sleep(load_minimum)
         if aem.tap_img("df_img/dr_dk_apply.png"):
             result = True
             if aem.is_there_img("df_img/dr_dk_apply.png"):
-                aem.sleep(0.1)
+                aem.sleep(load_minimum)
                 aem.tap_img("df_img/dr_dk_cancel.png")
                 result = False
 
         if not result:
-            aem.sleep(0.1)
+            aem.sleep(load_minimum)
             aem.tap_img("df_img/dr_dk_bk.png")
 
     return result
@@ -176,9 +241,11 @@ if __name__ == '__main__':
         # return_base(aem)
         # __select_char(aem)
         # __select_disassemble(aem)
-        print(disassemble_all_char(aem))
-        print(make_fd(aem))
-
+        # print(disassemble_all_char(aem))
+        # print(make_fd(aem))
+        # print(change_attacker(aem, True))
+        # print(change_attacker(aem, False))
+        __go_b2ef(aem)
         pass
     except KeyboardInterrupt:
         aem.disconnect()
