@@ -44,6 +44,16 @@ class AndroidEmuMacro:
     # mode 0 : template and feature
     # mode 1 : template only
     # mode 2 : feature only
+    def match(self, train_img_path: str, save_img=False) -> list:
+        result = self.match_template(train_img_path, save_img=save_img)
+        if result[0]:
+            return result
+        else:
+            return self.match_feature(train_img_path, save_img=save_img)
+
+    # mode 0 : template and feature
+    # mode 1 : template only
+    # mode 2 : feature only
     def is_there_img(self, train_img_path: str, mode=0, save_img=False) -> bool:
         flag = False
         if mode in {0, 1}:
