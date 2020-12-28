@@ -129,17 +129,184 @@ def go_02(aem: AndroidEmuMacro) -> bool:
     return result
 
 
+# TODO posはintじゃなくてfloatでとれるから下層のシグネチャを変更しろ
 # 0-2で周回を行うコード
+# ここは要検討, noteを参照するように
+# 実装が適当になるのが確定
 # return
 # 1. is finishing this func : bool
 # 2. is exp full : bool
 def do_combat_02(aes: AndroidEmuMacro) -> list:
-    pass
+    # init
+    ###############################
+    # 部隊配置
+    flg1, pos_e1 = __drop_e1(aem)
+    flg2, pos_e2 = __drop_e2(aem)
+    # 戦闘開始
+    __start_combat(aem)
+    aem.sleep(load_maximum)
+    # 2部隊に補給
+    __supply_e(aem, pos_e2)
+    aem.sleep(load_medium)
+    # 2部隊を退却
+    __exit_e(aem, pos_e2)
+    aem.sleep(load_maximum)
+    # 1部隊を選択
+    __select_e(aem, pos_e1)
+    aem.sleep(load_medium)
+
+    # set route
+    ##############################
+    # プランモードを開始
+    __select_plan_mode(aem)
+    aem.sleep(load_minimum)
+    # ルートをセット
+    __set_route_02(aem)
+    aem.sleep(load_medium)
+
+    # do combat
+    ##############################
+    __do_plan(aem)
+
+    # end process
+    ##############################
+    tmp = 0
+    result = False
+    while True and tmp < 5:
+        tmp = tmp + 1
+        aem.sleep(180)
+        if aem.is_there_img("df_img/c02_result.png"):
+            aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
+            aem.sleep(load_minimum)
+            aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
+            aem.sleep(load_minimum)
+            aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
+            aem.sleep(load_minimum)
+            result = True
+            break
+
+    # resurn base
+    ##############################
+    __return_base(aem)
+    aem.sleep(load_maximum)
+
+    return [result, False]
 
 
 ###################################################
 # 以下下層の実装
 ###################################################
+
+# TODO 関数ごとに分別して後で然るべき場所に再配置せよ
+# 一時的にここに戦闘のコード書くね...
+# 明らかにラッパーにできる->あとでええやんけ
+
+def __do_plan(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/c02_do_plan.png")
+
+
+# 進行ルートを設定
+def __set_route_02(aem: AndroidEmuMacro) -> bool:
+    result = False
+    result, pos = aem.match("df_img/c02_p6798.png")
+    # power 4795 出現までスワイプする
+    tmp = 0
+    while result and not aem.is_there_img("df_img/c02_p4797.png") and tmp < 5:
+        tmp = tmp + 1
+        aem.swipe(pos[0], pos[1], pos[0], 900)
+
+    # p4795をタップ
+    aem.tap_img("df_img/c02_p4797.png")
+
+    # 終点が見えるまでスワイプ x -> 700くらいまで
+    tmp = 0
+    while not aem.is_there_img("df_img/c02_endpoint.png") and tmp < 5:
+        tmp = tmp + 1
+        aem.swipe_img("df_img/c02_p6316.png", 110, 405)
+
+    # 終点をタップ
+    result = aem.tap_img("df_img/c02_endpoint.png")
+
+    return result
+
+
+def __swipe_c02_1(aem: AndroidEmuMacro, m_sec=500):
+    return aem.swipe_img("df_img/c02_p6798.png", 200, 1050, m_sec=m_sec)
+
+
+def __select_plan_mode(aem: AndroidEmuMacro):
+    return aem.tap_img("df_img/c02_plan.png")
+
+
+def __select_e(aem: AndroidEmuMacro, pos: list) -> bool:
+    return aem.tap(pos[0], pos[1])
+
+
+def __exit_e(aem: AndroidEmuMacro, pos: list) -> bool:
+    aem.tap(pos[0], pos[1])
+    aem.sleep(load_medium)
+    aem.tap_img("df_img/c02_exit.png")
+    aem.sleep(load_medium)
+    return aem.tap_img("df_img/c02_exit_apply.png")
+
+
+# 補給
+def __supply_e(aem: AndroidEmuMacro, pos: list) -> bool:
+    aem.tap(pos[0], pos[1])
+    aem.sleep(load_medium)
+    return aem.tap_img("df_img/c02_supply.png")
+
+
+# 戦闘開始
+def __start_combat(aem: AndroidEmuMacro) -> bool:
+    return aem.tap_img("df_img/c02_apply.png")
+
+
+# 部隊1の配置およびその位置の取得
+def __drop_e1(aem: AndroidEmuMacro) -> list:
+    result = aem.match("df_img/c02_hq.png")
+    if result[0]:
+        aem.tap(result[1][0], result[1][1])
+        aem.sleep(load_medium)
+        # 奴隷1号が壊れてたら修理する
+        if __is_m16_broken(aem):
+            # TODO 修復不可なら例外を投げるコードに改造する
+            __repair_in_field(aem)
+        # 配置する
+        aem.tap_img("df_img/c02_drop.png")
+        aem.sleep(load_medium)
+        aem.sleep(load_medium)
+
+    return result
+
+
+# 部隊2の配置およびその位置の取得
+def __drop_e2(aem: AndroidEmuMacro) -> list:
+    result = aem.match("df_img/c02_h1.png")
+    if result[0]:
+        aem.tap(result[1][0], result[1][1])
+        aem.sleep(load_medium)
+        # 配置する
+        aem.tap_img("df_img/c02_drop.png")
+        aem.sleep(load_medium)
+        aem.sleep(load_medium)
+
+    return result
+
+
+# 奴隷一号が壊れていないか確認する
+# TODO めんどいけど実装しろや
+def __is_m16_broken(aem: AndroidEmuMacro) -> bool:
+    return True
+
+
+# パーティーを修理する
+# TODO 実装しとけ
+def __repair_in_field(aem: AndroidEmuMacro) -> bool:
+    return True
+
+
+####
 
 # たぶんうごく
 # マルチメニューをひらく
@@ -307,24 +474,36 @@ if __name__ == '__main__':
 
     # macro code
     try:
-        # check_logistic_support(aem)
-        # go_h2factory(aem)
-        # go_ft2retire(aem)
-        # return_base(aem)
-        # __select_char(aem)
-        # __select_disassemble(aem)
-        # print(disassemble_all_char(aem))
-        # print(make_fd(aem))
-        # print(change_attacker(aem, True))
-        # __change_e2_to_e1(aem)
-        print(change_attacker(aem, False))
-        # __select_echelon_2(aem)
-        # go_02(aem)
-        # while True:
-        #     check_logistic_support(aem)
-        #     print("manjyu~~~~")
-        #     aem.sleep(300)
-        pass
+        # init
+        is_ef1 = True
+        is_exp_full = False
+        check_logistic_support(aem)
+
+        # loop
+        #############################
+        # 人形の解体
+        disassemble_all_char(aem)
+        check_logistic_support(aem)
+
+        # 経験値たまってたらfd作る
+        if is_exp_full:
+            make_fd(aem)
+            check_logistic_support(aem)
+
+        # 部隊の入れ替え
+        if is_ef1:
+            change_attacker(aem, is_ef1)
+        else:
+            change_attacker(aem, is_ef1)
+        is_ef1 = not is_ef1
+        check_logistic_support(aem)
+
+        # 02侵入および戦闘
+        go_02(aem)
+        do_combat_02(aem)
+        check_logistic_support(aem)
+        ###############################
+
     except KeyboardInterrupt:
         aem.disconnect()
         print("周回を終了")
