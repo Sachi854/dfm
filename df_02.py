@@ -59,8 +59,10 @@ def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
 def make_fd(aem: AndroidEmuMacro) -> bool:
     # 工廠->マルチメニュー経由でデータルームへ
     __go_b2factory(aem)
+    print("k")
     aem.sleep(load_maximum)
     __open_multi_menu(aem)
+    print("om")
     aem.sleep(load_medium)
     __go_m2dataroom(aem)
     aem.sleep(load_maximum)
@@ -183,15 +185,15 @@ def do_combat_02(aem: AndroidEmuMacro) -> list:
     # end process
     ##############################
     result = False
-    while True:
+    tmp = 0
+    while tmp < 20:
+        tmp = tmp + 1
         aem.sleep(30)
         if __process_ending(aem):
+            result = True
             break
-
-    # return base
-    ##############################
-    __return_base(aem)
-    aem.sleep(load_maximum)
+        else:
+            result = False
 
     return [result, False]
 
@@ -205,10 +207,13 @@ def do_combat_02(aem: AndroidEmuMacro) -> list:
 # 明らかにラッパーにできる->あとでええやんけ
 
 # 終了処理
+# 途中抜けしない限りホームに戻る仕様らしい
 def __process_ending(aem: AndroidEmuMacro) -> bool:
-    flg, pos = aem.match("df_img/cxx_result.png")
+    flg, pos = aem.match_template("df_img/c02_result.png", 0.95)
+    print(pos)
     if flg:
-        while not aem.is_there_img("df_img/multi_menu.png"):
+        while not (aem.is_there_img("df_img/b_ft.png") or aem.is_there_img("df_img/b_ls.png")):
+            print("????")
             aem.tap(pos[0], pos[1])
             aem.sleep(load_medium)
 
@@ -347,7 +352,7 @@ def __go_m2dataroom(aem: AndroidEmuMacro) -> bool:
 def __return_base(aem: AndroidEmuMacro) -> bool:
     if __open_multi_menu(aem):
         aem.sleep(load_medium)
-        return aem.tap_img("df_img/return_base.png")
+        return aem.tap_img("df_img/return_base_adv.png")
     return False
 
 
@@ -503,10 +508,9 @@ def __make_fd(aem: AndroidEmuMacro) -> bool:
 
 #######################################################
 # main func
-def start_02_loop(aem: AndroidEmuMacro):
+def start_02_loop(aem: AndroidEmuMacro, is_ef1=True) -> bool:
     # init
     print("初期化中......")
-    is_ef1 = False
     is_exp_full = False
     check_logistic_support(aem)
     print("+準備完了+")
@@ -517,9 +521,10 @@ def start_02_loop(aem: AndroidEmuMacro):
     # 人形の解体
     print("保有人形を解体中......")
     if disassemble_all_char(aem):
-        print("全員解体")
+        print("success!!")
     else:
-        print("解体に失敗")
+        print("fail!!")
+        return False
     check_logistic_support(aem)
 
     # 経験値たまってたらfd作る
@@ -530,25 +535,44 @@ def start_02_loop(aem: AndroidEmuMacro):
 
     # 部隊の入れ替え
     print("アタッカーを交換中......")
-    change_attacker(aem, is_ef1)
-    print("アタッカーを交換")
-    is_ef1 = not is_ef1
+    if change_attacker(aem, is_ef1):
+        print("success!!")
+        is_ef1 = not is_ef1
+    else:
+        print("fail!!")
+        return False
     check_logistic_support(aem)
 
     # やらかした即, break
     # 02侵入および戦闘
-    print("0-2に侵入中")
-    go_02(aem)
-    print("0-2に侵入")
-    print("戦闘開始")
+    print("0-2に侵入......")
+    if go_02(aem):
+        print("success!!")
+    else:
+        print("fail!!")
+        return False
+
+    print("戦闘中......")
     dummy, is_exp_full = do_combat_02(aem)
-    print("戦闘終了")
+    if dummy:
+        print("success!!")
+    else:
+        print("fail!!")
+        return False
     print("------------------")
     check_logistic_support(aem)
     ###############################
 
-    # fd作る
-    pass
+    # 戦闘終わりに作戦報告書をつくる
+    aem.sleep(load_maximum)
+    print("フロッピーを作成...")
+    if make_fd(aem):
+        print("success!!")
+    else:
+        print("fail!!")
+    check_logistic_support(aem)
+
+    return True
 
 
 def debug_func(aem: AndroidEmuMacro):
@@ -556,7 +580,10 @@ def debug_func(aem: AndroidEmuMacro):
     # change_attacker(aem, True)
     # print(__is_m16_broken(aem))
 
-    print(aem.is_there_img("df_img/cxx_result.png"))
+    # print(aem.is_there_img("df_img/cxx_result.png"))
+    __process_ending(aem)
+    # __return_base(aem)
+    # make_fd(aem)
 
 
 # TODO 日付変更のに対応するコードを追加したほうがいいかも
@@ -571,8 +598,8 @@ if __name__ == '__main__':
 
     # func
     ###################################
-    # start_02_loop(aem)
-    debug_func(aem)
+    start_02_loop(aem, False)
+    # debug_func(aem)
 
     # destruct
     ###################################
