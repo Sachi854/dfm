@@ -182,19 +182,10 @@ def do_combat_02(aem: AndroidEmuMacro) -> list:
 
     # end process
     ##############################
-    tmp = 0
     result = False
-    while True and tmp < 10:
-        tmp = tmp + 1
+    while True:
         aem.sleep(30)
-        if aem.is_there_img("df_img/c02_result.png"):
-            aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
-            aem.sleep(load_medium)
-            aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
-            aem.sleep(load_medium)
-            aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
-            aem.sleep(load_medium)
-            result = True
+        if __process_ending(aem):
             break
 
     # return base
@@ -212,6 +203,17 @@ def do_combat_02(aem: AndroidEmuMacro) -> list:
 # TODO 関数ごとに分別して後で然るべき場所に再配置せよ
 # 一時的にここに戦闘のコード書くね...
 # 明らかにラッパーにできる->あとでええやんけ
+
+# 終了処理
+def __process_ending(aem: AndroidEmuMacro) -> bool:
+    flg, pos = aem.match("df_img/cxx_result.png")
+    if flg:
+        while not aem.is_there_img("df_img/multi_menu.png"):
+            aem.tap(pos[0], pos[1])
+            aem.sleep(load_medium)
+
+    return flg
+
 
 def __do_plan(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/c02_do_plan.png")
@@ -553,7 +555,8 @@ def debug_func(aem: AndroidEmuMacro):
     # __set_reader(aem)
     # change_attacker(aem, True)
     # print(__is_m16_broken(aem))
-    pass
+
+    print(aem.is_there_img("df_img/cxx_result.png"))
 
 
 # TODO 日付変更のに対応するコードを追加したほうがいいかも
@@ -568,8 +571,8 @@ if __name__ == '__main__':
 
     # func
     ###################################
-    start_02_loop(aem)
-    # debug_func(aem)
+    # start_02_loop(aem)
+    debug_func(aem)
 
     # destruct
     ###################################
