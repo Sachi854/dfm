@@ -3,7 +3,6 @@ from object_detection import ObjectDetection
 
 import os
 import time
-import numpy as np
 
 
 class AndroidEmuMacro:
