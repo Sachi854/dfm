@@ -1,5 +1,7 @@
 from android_emu_macro import AndroidEmuMacro
 import random
+import cv2
+import numpy as np
 
 ###################################################
 # 使うならこのレベルのAPIがいいとおもう
@@ -107,6 +109,11 @@ def change_attacker(aem: AndroidEmuMacro, is_formation_1: bool) -> bool:
         result = __change_e2_to_e1(aem)
         aem.sleep(load_medium)
 
+        # TODO これバグいから変更, 下位APIに手動で部分比較させるコードを追加する部分
+        # 2部隊が隊長が確実にいるように変更
+        __set_reader(aem)
+        aem.sleep(load_medium)
+
         # ベースへ
         __return_base(aem)
         aem.sleep(load_maximum)
@@ -130,13 +137,14 @@ def go_02(aem: AndroidEmuMacro) -> bool:
 
 
 # TODO posはintじゃなくてfloatでとれるから下層のシグネチャを変更しろ
+# TODO 奴隷1号の破壊ぐわいを確認するコードを追記せよ
 # 0-2で周回を行うコード
 # ここは要検討, noteを参照するように
 # 実装が適当になるのが確定
 # return
 # 1. is finishing this func : bool
 # 2. is exp full : bool
-def do_combat_02(aes: AndroidEmuMacro) -> list:
+def do_combat_02(aem: AndroidEmuMacro) -> list:
     # init
     ###############################
     # 部隊配置
@@ -172,20 +180,20 @@ def do_combat_02(aes: AndroidEmuMacro) -> list:
     ##############################
     tmp = 0
     result = False
-    while True and tmp < 5:
+    while True and tmp < 10:
         tmp = tmp + 1
-        aem.sleep(180)
+        aem.sleep(30)
         if aem.is_there_img("df_img/c02_result.png"):
             aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
-            aem.sleep(load_minimum)
+            aem.sleep(load_medium)
             aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
-            aem.sleep(load_minimum)
+            aem.sleep(load_medium)
             aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
-            aem.sleep(load_minimum)
+            aem.sleep(load_medium)
             result = True
             break
 
-    # resurn base
+    # return base
     ##############################
     __return_base(aem)
     aem.sleep(load_maximum)
@@ -297,13 +305,25 @@ def __drop_e2(aem: AndroidEmuMacro) -> list:
 # 奴隷一号が壊れていないか確認する
 # TODO めんどいけど実装しろや
 def __is_m16_broken(aem: AndroidEmuMacro) -> bool:
-    return True
+    flg, pos = aem.match("df_img/c02_repair_m16.png")
+    # hp bar の長さ y->218
+    # y 位置 778
+    y = 778
+    if flg:
+        aem.screenshot(0)
+        img1 = cv2.imread("imgs/screenshot0.png")
+        img2 = cv2.imread("df_img/c02_repair_bar.png")
+        x_, y_, l_ = img2.shape
+        return np.array_equal(img1, img2[y::(y + y_), pos[0]::(pos[0] + x_), ::])
+
+    return False
 
 
 # パーティーを修理する
 # TODO 実装しとけ
 def __repair_in_field(aem: AndroidEmuMacro) -> bool:
-    return True
+    if aem.tap_img("df_img/c02_repair_apply.png"):
+        return aem.tap_img("df_img/c02_repair_apply_re.png")
 
 
 ####
@@ -387,6 +407,20 @@ def __select_formation(aem: AndroidEmuMacro, img_path: str) -> bool:
     return result
 
 
+def __set_reader(aem: AndroidEmuMacro) -> None:
+    x = 424
+    y = 304
+    pitch = 277
+    aem.screenshot(0)
+    # TODO ここやっぱAPIの設計的に下層にしたほうよくね？
+    img1 = cv2.imread("imgs/screenshot0.png")
+    img2 = cv2.imread("df_img/kakera3.png")
+    for i in range(1, 5):
+        if not np.array_equal(img1[x, y + pitch * i, ::], img2[10, 10, ::]):
+            aem.swipe((y + pitch * i), x, y, x)
+            break
+
+
 # うごく
 # 人形を上一列選択
 def __select_char(aem: AndroidEmuMacro) -> bool:
@@ -465,50 +499,67 @@ def __make_fd(aem: AndroidEmuMacro) -> bool:
     return result
 
 
+#######################################################
+# main func
+def start_02_loop(aem: AndroidEmuMacro):
+    # init
+    is_ef1 = True
+    is_exp_full = False
+    check_logistic_support(aem)
+
+    # loop
+    #############################
+    # 人形の解体
+    disassemble_all_char(aem)
+    check_logistic_support(aem)
+
+    # 経験値たまってたらfd作る
+    # 検知めんどいから回数と決め打ちでいいすか？
+    if is_exp_full:
+        make_fd(aem)
+        check_logistic_support(aem)
+
+    # 部隊の入れ替え
+    if is_ef1:
+        change_attacker(aem, is_ef1)
+    else:
+        change_attacker(aem, is_ef1)
+    is_ef1 = not is_ef1
+    check_logistic_support(aem)
+
+    # 02侵入および戦闘
+    go_02(aem)
+    dummy, is_exp_full = do_combat_02(aem)
+    check_logistic_support(aem)
+    ###############################
+
+    # fd作る
+    pass
+
+
+def debug_func(aem: AndroidEmuMacro):
+    # __set_reader(aem)
+    # change_attacker(aem, True)
+    pass
+
+
+# TODO 日付変更のに対応するコードを追加したほうがいいかも
 if __name__ == '__main__':
+    # init
+    ###################################
     aem = AndroidEmuMacro()
     aem.connect()
     aem.sleep(2)
     print("周回を開始 : 停止 -> ctrl^c")
     print("==========================")
 
-    # macro code
-    try:
-        # init
-        is_ef1 = True
-        is_exp_full = False
-        check_logistic_support(aem)
+    # func
+    ###################################
+    # start_02_loop(aem)
+    debug_func(aem)
 
-        # loop
-        #############################
-        # 人形の解体
-        disassemble_all_char(aem)
-        check_logistic_support(aem)
-
-        # 経験値たまってたらfd作る
-        if is_exp_full:
-            make_fd(aem)
-            check_logistic_support(aem)
-
-        # 部隊の入れ替え
-        if is_ef1:
-            change_attacker(aem, is_ef1)
-        else:
-            change_attacker(aem, is_ef1)
-        is_ef1 = not is_ef1
-        check_logistic_support(aem)
-
-        # 02侵入および戦闘
-        go_02(aem)
-        do_combat_02(aem)
-        check_logistic_support(aem)
-        ###############################
-
-    except KeyboardInterrupt:
-        aem.disconnect()
-        print("周回を終了")
-
-    # デバッグ用に用意, リリース時は削除するように
+    # destruct
+    ###################################
     aem.disconnect()
     print("==========================")
     print("周回を終了")
