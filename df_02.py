@@ -59,10 +59,8 @@ def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
 def make_fd(aem: AndroidEmuMacro) -> bool:
     # 工廠->マルチメニュー経由でデータルームへ
     __go_b2factory(aem)
-    print("k")
     aem.sleep(load_maximum)
     __open_multi_menu(aem)
-    print("om")
     aem.sleep(load_medium)
     __go_m2dataroom(aem)
     aem.sleep(load_maximum)
@@ -210,10 +208,8 @@ def do_combat_02(aem: AndroidEmuMacro) -> list:
 # 途中抜けしない限りホームに戻る仕様らしい
 def __process_ending(aem: AndroidEmuMacro) -> bool:
     flg, pos = aem.match_template("df_img/c02_result.png", 0.95)
-    print(pos)
     if flg:
         while not (aem.is_there_img("df_img/b_ft.png") or aem.is_there_img("df_img/b_ls.png")):
-            print("????")
             aem.tap(pos[0], pos[1])
             aem.sleep(load_medium)
 
