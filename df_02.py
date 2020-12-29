@@ -303,7 +303,6 @@ def __drop_e2(aem: AndroidEmuMacro) -> list:
 
 
 # 奴隷一号が壊れていないか確認する
-# TODO めんどいけど実装しろや
 def __is_m16_broken(aem: AndroidEmuMacro) -> bool:
     flg, pos = aem.match("df_img/c02_repair_m16.png")
     # hp bar の長さ y->218
@@ -313,21 +312,20 @@ def __is_m16_broken(aem: AndroidEmuMacro) -> bool:
         aem.screenshot(0)
         img1 = cv2.imread("imgs/screenshot0.png")
         img2 = cv2.imread("df_img/c02_repair_bar.png")
-        x_, y_, l_ = img2.shape
-        return np.array_equal(img1, img2[y::(y + y_), pos[0]::(pos[0] + x_), ::])
+        print(img1.shape)
+        print(img2.shape)
+        return np.array_equal(img1[y, int(pos[0]), ::], img2[0, 0, ::])
 
     return False
 
 
 # パーティーを修理する
-# TODO 実装しとけ
 def __repair_in_field(aem: AndroidEmuMacro) -> bool:
     if aem.tap_img("df_img/c02_repair_apply.png"):
         return aem.tap_img("df_img/c02_repair_apply_re.png")
 
 
 ####
-
 # たぶんうごく
 # マルチメニューをひらく
 def __open_multi_menu(aem: AndroidEmuMacro) -> bool:
@@ -540,6 +538,7 @@ def start_02_loop(aem: AndroidEmuMacro):
 def debug_func(aem: AndroidEmuMacro):
     # __set_reader(aem)
     # change_attacker(aem, True)
+    print(__is_m16_broken(aem))
     pass
 
 
@@ -555,8 +554,8 @@ if __name__ == '__main__':
 
     # func
     ###################################
-    # start_02_loop(aem)
-    debug_func(aem)
+    start_02_loop(aem)
+    # debug_func(aem)
 
     # destruct
     ###################################
