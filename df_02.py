@@ -154,6 +154,8 @@ def do_combat_02(aem: AndroidEmuMacro) -> list:
     __start_combat(aem)
     aem.sleep(load_maximum)
     # 2部隊に補給
+    __select_e(aem, pos_e2)
+    aem.sleep(load_medium)
     __supply_e(aem, pos_e2)
     aem.sleep(load_medium)
     # 2部隊を退却
@@ -175,6 +177,8 @@ def do_combat_02(aem: AndroidEmuMacro) -> list:
     # do combat
     ##############################
     __do_plan(aem)
+    if aem.is_there_img("df_img/c02_warning.png"):
+        return False
 
     # end process
     ##############################
@@ -312,8 +316,6 @@ def __is_m16_broken(aem: AndroidEmuMacro) -> bool:
         aem.screenshot(0)
         img1 = cv2.imread("imgs/screenshot0.png")
         img2 = cv2.imread("df_img/c02_repair_bar.png")
-        print(img1.shape)
-        print(img2.shape)
         return np.array_equal(img1[y, int(pos[0]), ::], img2[0, 0, ::])
 
     return False
@@ -501,14 +503,21 @@ def __make_fd(aem: AndroidEmuMacro) -> bool:
 # main func
 def start_02_loop(aem: AndroidEmuMacro):
     # init
-    is_ef1 = True
+    print("初期化中......")
+    is_ef1 = False
     is_exp_full = False
     check_logistic_support(aem)
+    print("+準備完了+")
+    print("------------------")
 
     # loop
     #############################
     # 人形の解体
-    disassemble_all_char(aem)
+    print("保有人形を解体中......")
+    if disassemble_all_char(aem):
+        print("全員解体")
+    else:
+        print("解体に失敗")
     check_logistic_support(aem)
 
     # 経験値たまってたらfd作る
@@ -518,16 +527,21 @@ def start_02_loop(aem: AndroidEmuMacro):
         check_logistic_support(aem)
 
     # 部隊の入れ替え
-    if is_ef1:
-        change_attacker(aem, is_ef1)
-    else:
-        change_attacker(aem, is_ef1)
+    print("アタッカーを交換中......")
+    change_attacker(aem, is_ef1)
+    print("アタッカーを交換")
     is_ef1 = not is_ef1
     check_logistic_support(aem)
 
+    # やらかした即, break
     # 02侵入および戦闘
+    print("0-2に侵入中")
     go_02(aem)
+    print("0-2に侵入")
+    print("戦闘開始")
     dummy, is_exp_full = do_combat_02(aem)
+    print("戦闘終了")
+    print("------------------")
     check_logistic_support(aem)
     ###############################
 
@@ -538,7 +552,7 @@ def start_02_loop(aem: AndroidEmuMacro):
 def debug_func(aem: AndroidEmuMacro):
     # __set_reader(aem)
     # change_attacker(aem, True)
-    print(__is_m16_broken(aem))
+    # print(__is_m16_broken(aem))
     pass
 
 
