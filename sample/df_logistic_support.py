@@ -5,11 +5,11 @@ import random
 def check_logistic_support(aem: AndroidEmuMacro) -> bool:
     result = False
     # 後方支援が帰ってるか判定
-    while aem.is_there_img("df_img/b_ls.png"):
+    while aem.is_there_img("../df_img/b_ls.png"):
         result = True
         aem.tap(random.randrange(400, 1500, 1), random.randrange(200, 800, 1))
         aem.sleep(2)
-        aem.tap_img("df_img/b_ls_apply.png")
+        aem.tap_img("../df_img/b_ls_apply.png")
         aem.sleep(8)
     return result
 
