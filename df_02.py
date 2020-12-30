@@ -42,7 +42,8 @@ def disassemble_all_char(aem: AndroidEmuMacro) -> bool:
         # 分解できるキャラがいればキャラ選択へ
         while __enter_select_char(aem):
             # キャラ選択とばらすボタンオス処理
-            __select_char(aem)
+            if not __select_char(aem):
+                break
             aem.sleep(load_minimum)
             __disassemble(aem)
             aem.sleep(load_medium)
@@ -511,75 +512,74 @@ def start_02_loop(aem: AndroidEmuMacro, is_ef1=True) -> bool:
     check_logistic_support(aem)
     print("+準備完了+")
     print("------------------")
+    count = 0
 
     # loop
     #############################
-    # 人形の解体
-    print("保有人形を解体中......")
-    if disassemble_all_char(aem):
-        print("success!!")
-    else:
-        print("fail!!")
-        return False
-    check_logistic_support(aem)
+    try:
+        while True:
+            # 人形の解体
+            print("保有人形を解体中......")
+            if disassemble_all_char(aem):
+                print("success!!")
+            else:
+                print("fail!!")
+                return False
+            check_logistic_support(aem)
 
-    # 経験値たまってたらfd作る
-    # 検知めんどいから回数と決め打ちでいいすか？
-    if is_exp_full:
-        make_fd(aem)
-        check_logistic_support(aem)
+            # 経験値たまってたらfd作る
+            # 検知めんどいから回数と決め打ちでいいすか？
+            if is_exp_full or count == 20:
+                make_fd(aem)
+                check_logistic_support(aem)
 
-    # 部隊の入れ替え
-    print("アタッカーを交換中......")
-    if change_attacker(aem, is_ef1):
-        print("success!!")
-        is_ef1 = not is_ef1
-    else:
-        print("fail!!")
-        return False
-    check_logistic_support(aem)
+            # 部隊の入れ替え
+            print("アタッカーを交換中......")
+            if change_attacker(aem, is_ef1):
+                print("success!!")
+                is_ef1 = not is_ef1
+            else:
+                print("fail!!")
+                return False
+            check_logistic_support(aem)
 
-    # やらかした即, break
-    # 02侵入および戦闘
-    print("0-2に侵入......")
-    if go_02(aem):
-        print("success!!")
-    else:
-        print("fail!!")
-        return False
+            # やらかした即, break
+            # 02侵入および戦闘
+            print("0-2に侵入......")
+            if go_02(aem):
+                print("success!!")
+            else:
+                print("fail!!")
+                return False
 
-    print("戦闘中......")
-    dummy, is_exp_full = do_combat_02(aem)
-    if dummy:
-        print("success!!")
-    else:
-        print("fail!!")
-        return False
-    print("------------------")
-    check_logistic_support(aem)
-    ###############################
-
-    # 戦闘終わりに作戦報告書をつくる
-    aem.sleep(load_maximum)
-    print("フロッピーを作成...")
-    if make_fd(aem):
-        print("success!!")
-    else:
-        print("fail!!")
-    check_logistic_support(aem)
+            print("戦闘中......")
+            dummy, is_exp_full = do_combat_02(aem)
+            if dummy:
+                print("success!!")
+            else:
+                print("fail!!")
+                return False
+            print("------------------")
+            check_logistic_support(aem)
+            count = count + 1
+    except KeyboardInterrupt:
+        pass
 
     return True
 
 
 def debug_func(aem: AndroidEmuMacro):
-    # __set_reader(aem)
-    # change_attacker(aem, True)
-    # print(__is_m16_broken(aem))
+    while __enter_select_char(aem):
+        # キャラ選択とばらすボタンオス処理
+        if not __select_char(aem):
+            break
+        aem.sleep(load_minimum)
+        __disassemble(aem)
+        aem.sleep(load_medium)
 
-    # print(aem.is_there_img("df_img/cxx_result.png"))
-    __process_ending(aem)
-    # __return_base(aem)
-    # make_fd(aem)
+    # ベースへ
+    __return_base(aem)
+    aem.sleep(load_maximum)
 
 
 # TODO 日付変更のに対応するコードを追加したほうがいいかも
@@ -592,10 +592,10 @@ if __name__ == '__main__':
     print("周回を開始 : 停止 -> ctrl^c")
     print("==========================")
 
-    # func
-    ###################################
-    start_02_loop(aem, False)
-    # debug_func(aem)
+    # loop
+    # この関数で02とかの設定を記述してい動かすほうがいいかもしんね
+    # start_02_loop(aem, True)
+    debug_func(aem)
 
     # destruct
     ###################################
