@@ -27,7 +27,6 @@ class AndroidEmuMacro:
     def restart(self) -> None:
         self.__aw.restart()
 
-    # 全引数を有効にすべきかそうでないか
     # 特徴量でマッチング
     def match_feature(self, train_img_path: str, threshold=4, sample_num=20, ratio=0.5, save_img=False) -> list:
         self.screenshot(0)
@@ -40,9 +39,7 @@ class AndroidEmuMacro:
         return self.__od.match_img_template(self.__save_img_path + "/screenshot0.png", train_img_path,
                                             threshold, [save_img, self.__save_img_path + "/mt.png"])
 
-    # mode 0 : template and feature
-    # mode 1 : template only
-    # mode 2 : feature only
+    # テンプレートマッチングを優先でマッチングその後特徴量でマッチング
     def match(self, train_img_path: str, save_img=False) -> list:
         result = self.match_template(train_img_path, save_img=save_img)
         if result[0]:
@@ -132,8 +129,6 @@ class AndroidEmuMacro:
         self.__aw.screenshot(self.__save_img_path, "/screenshot" + str(offset) + ".png")
 
 
-# add df test
-# 特徴抽出は使える場合と死ぬ場合が極端だからパターンマッチングも実装しとく
 if __name__ == '__main__':
     aem = AndroidEmuMacro()
     aem.connect()
