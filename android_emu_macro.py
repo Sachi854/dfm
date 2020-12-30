@@ -10,7 +10,7 @@ class AndroidEmuMacro:
         """
         Constructor.
 
-        Parameters
+        Parameters:
         ----------
         adb_path : str
             Path of adb.
@@ -29,7 +29,7 @@ class AndroidEmuMacro:
         """
         Connect adb server of emulator.
 
-        Parameters
+        Parameters:
         ----------
         device_address : str
             IP address that can be checked in the settings of emulator.
@@ -60,7 +60,7 @@ class AndroidEmuMacro:
         Algorithm is object detection.
         Match for slightly obscure images.
 
-        Parameters
+        Parameters:
         ----------
         train_img_path : str
             Path of input image.
@@ -89,7 +89,7 @@ class AndroidEmuMacro:
         Algorithm is template matching.
         Match for per-pixel.
 
-        Parameters
+        Parameters:
         ----------
         train_img_path : str
             Path of input image.
@@ -113,7 +113,7 @@ class AndroidEmuMacro:
         Returns the coordinates of the image match.
         Match for template or feature.
 
-        Parameters
+        Parameters:
         ----------
         train_img_path : str
             Path of input image.
@@ -138,7 +138,7 @@ class AndroidEmuMacro:
         """
         Judge is there this image.
 
-        Parameters
+        Parameters:
         ----------
         train_img_path : str
             Path of input image.
@@ -165,7 +165,7 @@ class AndroidEmuMacro:
         """
         Tap input image.
 
-        Parameters
+        Parameters:
         ----------
         train_img_path : str
             Path of input image.
@@ -197,7 +197,7 @@ class AndroidEmuMacro:
         """
         Long tap input image.
 
-        Parameters
+        Parameters:
         ----------
         train_img_path : str
             Path of input image.
@@ -229,7 +229,7 @@ class AndroidEmuMacro:
         """
         Swipe input image.
 
-        Parameters
+        Parameters:
         ----------
         train_img_path : int
             Path of input image.
@@ -264,7 +264,7 @@ class AndroidEmuMacro:
         """
         Tap input coordinates.
 
-        Parameters
+        Parameters:
         ----------
         x : int
             target coordinate of x.
@@ -279,7 +279,7 @@ class AndroidEmuMacro:
         """
         Long tap input coordinates.
 
-        Parameters
+        Parameters:
         ----------
         x : int
             target coordinate of x.
@@ -294,7 +294,7 @@ class AndroidEmuMacro:
         """
         Swipe input coordinates to target coordinates.
 
-        Parameters
+        Parameters:
         ----------
         x1 : int
             Current coordinate of x.
@@ -314,7 +314,7 @@ class AndroidEmuMacro:
         """
         Sleep sec.
 
-        Parameters
+        Parameters:
         ----------
         sec : float
             sec.
@@ -326,7 +326,7 @@ class AndroidEmuMacro:
         """
         Sleep micro sec.
 
-        Parameters
+        Parameters:
         ----------
         m_sec : float
             micro sec.
@@ -337,7 +337,7 @@ class AndroidEmuMacro:
         """
         Take screen shot.
 
-        Parameters
+        Parameters:
         ----------
         offset : int
             Number of saving
