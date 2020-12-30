@@ -14,7 +14,6 @@ load_minimum = 0.4
 
 
 # ベースを基準に動かそうとおもう
-# まるちめにゅーっぽいやつは保留
 
 # うごく
 # 後方支援処理
@@ -77,7 +76,6 @@ def make_fd(aem: AndroidEmuMacro) -> bool:
         return False
 
 
-# TODO 戦闘に飛ぶ可能性があるっぽいから検証しとけ
 # あやしいけどうごく
 # アタッカーの入れ替え
 def change_attacker(aem: AndroidEmuMacro, is_formation_1: bool) -> bool:
@@ -110,7 +108,6 @@ def change_attacker(aem: AndroidEmuMacro, is_formation_1: bool) -> bool:
         result = __change_e2_to_e1(aem)
         aem.sleep(load_medium)
 
-        # TODO これバグいから変更, 下位APIに手動で部分比較させるコードを追加する部分
         # 2部隊が隊長が確実にいるように変更
         __set_reader(aem)
         aem.sleep(load_medium)
@@ -138,7 +135,6 @@ def go_02(aem: AndroidEmuMacro) -> bool:
 
 
 # TODO posはintじゃなくてfloatでとれるから下層のシグネチャを変更しろ
-# TODO 奴隷1号の破壊ぐわいを確認するコードを追記せよ
 # 0-2で周回を行うコード
 # ここは要検討, noteを参照するように
 # 実装が適当になるのが確定
@@ -286,7 +282,7 @@ def __drop_e1(aem: AndroidEmuMacro) -> list:
         aem.sleep(load_medium)
         # 奴隷1号が壊れてたら修理する
         if __is_m16_broken(aem):
-            # TODO 修復不可なら例外を投げるコードに改造する
+            # TODO 修復不可なら例外を投げるコードに拡張する
             __repair_in_field(aem)
         # 配置する
         aem.tap_img("df_img/c02_drop.png")
@@ -416,7 +412,7 @@ def __set_reader(aem: AndroidEmuMacro) -> None:
     y = 304
     pitch = 277
     aem.screenshot(0)
-    # TODO ここやっぱAPIの設計的に下層にしたほうよくね？
+    # TODO ここの処理下層にしたほうよくね？
     img1 = cv2.imread("imgs/screenshot0.png")
     img2 = cv2.imread("df_img/kakera3.png")
     for i in range(1, 5):
@@ -443,7 +439,6 @@ def __select_char(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/sc_apply.png")
 
 
-# TODO ずれてたときに修正するコード追加したほうがいいかも
 # 0-2を選択
 def __select_02(aem: AndroidEmuMacro) -> bool:
     return aem.tap_img("df_img/cbt_02.png")
@@ -511,13 +506,15 @@ def start_02_loop(aem: AndroidEmuMacro, is_ef1=True) -> bool:
     is_exp_full = False
     check_logistic_support(aem)
     print("+準備完了+")
-    print("------------------")
+    print("--------------------------")
     count = 0
 
     # loop
     #############################
     try:
         while True:
+            print(str(count) + '回目の周回 だ に" ゃ" ぁ" ぁ" ぁ" ぁ" ～')
+
             # 人形の解体
             print("保有人形を解体中......")
             if disassemble_all_char(aem):
@@ -529,7 +526,8 @@ def start_02_loop(aem: AndroidEmuMacro, is_ef1=True) -> bool:
 
             # 経験値たまってたらfd作る
             # 検知めんどいから回数と決め打ちでいいすか？
-            if is_exp_full or count == 20:
+            if is_exp_full or count == 16:
+                is_exp_full = False
                 make_fd(aem)
                 check_logistic_support(aem)
 
@@ -559,7 +557,7 @@ def start_02_loop(aem: AndroidEmuMacro, is_ef1=True) -> bool:
             else:
                 print("fail!!")
                 return False
-            print("------------------")
+            print("--------------------------")
             check_logistic_support(aem)
             count = count + 1
     except KeyboardInterrupt:
@@ -568,34 +566,28 @@ def start_02_loop(aem: AndroidEmuMacro, is_ef1=True) -> bool:
     return True
 
 
-def debug_func(aem: AndroidEmuMacro):
-    while __enter_select_char(aem):
-        # キャラ選択とばらすボタンオス処理
-        if not __select_char(aem):
-            break
-        aem.sleep(load_minimum)
-        __disassemble(aem)
-        aem.sleep(load_medium)
-
-    # ベースへ
-    __return_base(aem)
-    aem.sleep(load_maximum)
-
-
+# TODO 例外を投げるコードに変更したほうがいいと思われる
 # TODO 日付変更のに対応するコードを追加したほうがいいかも
 if __name__ == '__main__':
+    is_ef1 = True
+    print("==========================")
+    print("補給したアタッカーを2部隊に配置しましたか？")
+    print("周回開始時編成配置を入力してください")
+    s = input("部隊1 -> 1, 部隊2 -> 2 :: ")
+    if s == "2":
+        is_ef1 = not is_ef1
+
     # init
     ###################################
     aem = AndroidEmuMacro()
     aem.connect()
     aem.sleep(2)
+    print("==========================")
     print("周回を開始 : 停止 -> ctrl^c")
     print("==========================")
 
     # loop
-    # この関数で02とかの設定を記述してい動かすほうがいいかもしんね
-    # start_02_loop(aem, True)
-    debug_func(aem)
+    start_02_loop(aem, is_ef1)
 
     # destruct
     ###################################
