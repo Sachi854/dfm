@@ -3,7 +3,6 @@ from object_detection import ObjectDetection
 
 import os
 import time
-import numpy as np
 
 
 class AndroidEmuMacro:
@@ -28,7 +27,6 @@ class AndroidEmuMacro:
     def restart(self) -> None:
         self.__aw.restart()
 
-    # 全引数を有効にすべきかそうでないか
     # 特徴量でマッチング
     def match_feature(self, train_img_path: str, threshold=4, sample_num=20, ratio=0.5, save_img=False) -> list:
         self.screenshot(0)
@@ -40,6 +38,14 @@ class AndroidEmuMacro:
         self.screenshot(0)
         return self.__od.match_img_template(self.__save_img_path + "/screenshot0.png", train_img_path,
                                             threshold, [save_img, self.__save_img_path + "/mt.png"])
+
+    # テンプレートマッチングを優先でマッチングその後特徴量でマッチング
+    def match(self, train_img_path: str, save_img=False) -> list:
+        result = self.match_template(train_img_path, save_img=save_img)
+        if result[0]:
+            return result
+        else:
+            return self.match_feature(train_img_path, save_img=save_img)
 
     # mode 0 : template and feature
     # mode 1 : template only
@@ -123,16 +129,9 @@ class AndroidEmuMacro:
         self.__aw.screenshot(self.__save_img_path, "/screenshot" + str(offset) + ".png")
 
 
-# add df test
-# 特徴抽出は使える場合と死ぬ場合が極端だからパターンマッチングも実装しとく
 if __name__ == '__main__':
     aem = AndroidEmuMacro()
     aem.connect()
-
-    # 遠征後, クリック回数2 (1111,745->でうまくっぽい)
-
-    # macro
+    # スクショとるコード
     aem.screenshot()
-    #print(aem.is_there_img("img/screenshot3.png"))
-    # end macro
     aem.disconnect()
