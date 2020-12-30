@@ -2,7 +2,7 @@
 
 Android Emulatorの操作を自動化するライブラリ. ADBのラッパーとOpenCVを用いた物体検出で実装してある.
 
-*これだたのプロタイプだから仕様はめちゃくちゃに変更されると予想されるよ!*  
+*これだたのプロタイプだから仕様はめちゃくちゃに変更されると予想される!*  
 
 # Quick start
 
@@ -33,7 +33,7 @@ your_project_dir
   └── your_sourcecode.py
 ```
 
-以下のようにコードを書いてみる.  
+以下のようにコードを書く.  
 
 ```python
 from android_emu_macro import AndroidEmuMacro
@@ -52,16 +52,16 @@ if __name__ == '__main__':
     aem.disconnect()
 ```
 
-実行してみる.  
+実行する.  
 
 # Usage
 
-```pydocstring
+```python
 def __init__(self, adb_path="adb.exe", save_img_path="./imgs"):
     """
     コンストラクタ
 
-    Parameters
+    Parameters:
     ----------
     adb_path : str 
         adbのパス
@@ -75,7 +75,7 @@ def connect(self, device_address="localhost", device_port=5555) -> None:
     """
     ADBサーバに接続
     
-    Parameters
+    Parameters:
     ----------
     device_address : str
         エミュレータの設定から確認できる ADBサーバのip address
@@ -105,7 +105,7 @@ def match_feature(self, train_img_path: str, threshold=4, sample_num=20, ratio=0
     アルゴリズムは特徴量検出
     曖昧な画像検出向け
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         入力画像のパス 
@@ -132,7 +132,7 @@ def match_template(self, train_img_path: str, threshold=0.8, save_img=False) -> 
     アルゴリズムはテンプレートマッチング
     ピクセル単位での正確なマッチング
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         入力画像のパス 
@@ -154,7 +154,7 @@ def match(self, train_img_path: str, save_img=False) -> list:
     画面と画像をマッチングしその座標を返す
     テンプレートを優先でダメらな特徴量でマッチングさせる
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         入力画像のパス  
@@ -173,7 +173,7 @@ def is_there_img(self, train_img_path: str, mode=0, save_img=False) -> bool:
     """
     画面にその画像があるか判定
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         入力画像のパス  
@@ -193,7 +193,7 @@ def tap_img(self, train_img_path: str, mode=0, save_img=False) -> bool:
     """
     画面内にその画像があればタップ
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str 
         入力画像のパス  
@@ -213,7 +213,7 @@ def long_tap_img(self, train_img_path: str, m_sec=500, mode=0, save_img=False) -
     """
     画面内にその画像があればロングタップ
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str 
         入力画像のパス  
@@ -233,7 +233,7 @@ def swipe_img(self, train_img_path: str, x2: int, y2: int, m_sec=500, mode=0, sa
     """
     画面内にその画像があれば指定位置までスワイプ
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : int
         入力画像のパス  
@@ -259,7 +259,7 @@ def tap(self, x: int, y: int) -> None:
     """
     入力位置をタップ
     
-    Parameters
+    Parameters:
     ----------
     x : int
         x軸ターゲット座標
@@ -275,7 +275,7 @@ def long_tap(self, x: int, y: int, m_sec=500) -> None:
     """
     入力位置をロングタップ
     
-    Parameters
+    Parameters:
     ----------
     x : int
         x軸ターゲット座標
@@ -291,7 +291,7 @@ def swipe(self, x1: int, y1: int, x2: int, y2: int, m_sec=500) -> None:
     """
     入力位置をターゲット位置までスワイプ
     
-    Parameters
+    Parameters:
     ----------
     x1 : int
         x軸入力座標
@@ -310,7 +310,7 @@ def sleep(sec: float) -> None:
     """
     スリープ
     
-    Parameters
+    Parameters:
     ----------
     sec : float
         秒
@@ -322,7 +322,7 @@ def sleep_ms(m_sec: float) -> None:
     """
     スリープ
     
-    Parameters
+    Parameters:
     ----------
     m_sec : float
         ミリ秒
@@ -334,7 +334,7 @@ def screenshot(self, offset=1) -> None:
     """
     スクリーンショットを撮る
     
-    Parameters
+    Parameters:
     ----------
     offset : int
         セーブ画像の背中につく番号
@@ -344,7 +344,7 @@ def screenshot(self, offset=1) -> None:
 
 # Version
 
-0.1 : プロトタイプのリリース. -> (2020/12/31)
+0.1 : プロトタイプのリリース -> (2020/12/31)
 
 # License
 
@@ -352,7 +352,7 @@ MIT License
 
 # おまけ
 
-ドルフロ用マクロの使い方. 後で別のリポジトリに移すかも.  
+ドルフロ用マクロの使い方. 後で別のリポジトリに移す予定.  
 
 *これ使って何らかの損害を被った場合, 一切責任を負いません(ライセンスにも明記されてます)*
 

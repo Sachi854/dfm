@@ -57,16 +57,16 @@ Run this code.
 
 # Usage
 
-```pydocstring
+```python
 def __init__(self, adb_path="adb.exe", save_img_path="./imgs"):
     """
     Constructor.
 
-    Parameters
+    Parameters:
     ----------
     adb_path : str 
         Path of adb.
-    save_img_pat : str
+    save_img_path : str
         Path of save img.
     """
     pass
@@ -76,7 +76,7 @@ def connect(self, device_address="localhost", device_port=5555) -> None:
     """
     Connect adb server of emulator.
     
-    Parameters
+    Parameters:
     ----------
     device_address : str
         IP address that can be checked in the settings of emulator.
@@ -106,7 +106,7 @@ def match_feature(self, train_img_path: str, threshold=4, sample_num=20, ratio=0
     Algorithm is object detection.
     Match for slightly obscure images.
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         Path of input image. 
@@ -133,7 +133,7 @@ def match_template(self, train_img_path: str, threshold=0.8, save_img=False) -> 
     Algorithm is template matching.
     Match for per-pixel.
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         Path of input image. 
@@ -155,7 +155,7 @@ def match(self, train_img_path: str, save_img=False) -> list:
     Returns the coordinates of the image match.
     Match for template or feature.
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         Path of input image. 
@@ -174,7 +174,7 @@ def is_there_img(self, train_img_path: str, mode=0, save_img=False) -> bool:
     """
     Judge is there this image.
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         Path of input image.
@@ -194,7 +194,7 @@ def tap_img(self, train_img_path: str, mode=0, save_img=False) -> bool:
     """
     Tap input image.
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str 
         Path of input image.
@@ -214,7 +214,7 @@ def long_tap_img(self, train_img_path: str, m_sec=500, mode=0, save_img=False) -
     """
     Long tap input image.
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : str
         Path of input image.
@@ -234,7 +234,7 @@ def swipe_img(self, train_img_path: str, x2: int, y2: int, m_sec=500, mode=0, sa
     """
     Swipe input image.
     
-    Parameters
+    Parameters:
     ----------
     train_img_path : int
         Path of input image.
@@ -260,7 +260,7 @@ def tap(self, x: int, y: int) -> None:
     """
     Tap input coordinates.
     
-    Parameters
+    Parameters:
     ----------
     x : int
         target coordinate of x.
@@ -276,7 +276,7 @@ def long_tap(self, x: int, y: int, m_sec=500) -> None:
     """
     Long tap input coordinates.
     
-    Parameters
+    Parameters:
     ----------
     x : int
         target coordinate of x.
@@ -292,7 +292,7 @@ def swipe(self, x1: int, y1: int, x2: int, y2: int, m_sec=500) -> None:
     """
     Swipe input coordinates to target coordinates.
     
-    Parameters
+    Parameters:
     ----------
     x1 : int
         Current coordinate of x.
@@ -311,7 +311,7 @@ def sleep(sec: float) -> None:
     """
     Sleep sec.
     
-    Parameters
+    Parameters:
     ----------
     sec : float
         sec.
@@ -323,7 +323,7 @@ def sleep_ms(m_sec: float) -> None:
     """
     Sleep micro sec.
     
-    Parameters
+    Parameters:
     ----------
     m_sec : float
         micro sec.
@@ -335,7 +335,7 @@ def screenshot(self, offset=1) -> None:
     """
     Take screen shot.
     
-    Parameters
+    Parameters:
     ----------
     offset : int
         Number of saving
