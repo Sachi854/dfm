@@ -1,365 +1,101 @@
-# AndroidEmuMacro
+# どるふろまくろ。なの。
 
-Android Emulatorの操作を自動化するライブラリ. ADBのラッパーとOpenCVを用いた物体検出で実装してある.
+後方支援のポーリングと0-2周回ができるなの。  
 
-*これだたのプロタイプだから仕様はめちゃくちゃに変更されると予想される!*  
+これを使ってなにか問題が起きても悪いのはぷにぷにあたまのなてめぇなの。私は一切責任を負わないなの。  
 
-# Quick start
+# インストール方法。なの。  
 
-このプロジェクトをクローン.  
+このREADME.mdを読んでいるならもちろんバイナリファイルはダウンロードできてるなのね。  
+
+まずは適当なアンドロイドエミュレータをインストールするなの。おすすめは [MSI APP PLAYER](https://www.msi.com/Landing/appplayer) と [BlueStacks](www.bluestacks.com) なの。 どちらもIntelとかMicrosoftあたりから支援金もらってるレベルには信頼できるから安心しろなの。 (てかどっちもBlueStacks製なの...)  
+
+次にエミュレータにドルフロをインストールして動くことを確認するなの。当たり前なの。  
+
+そしたらエミュレータの設定からADBの設定を見つけて有効にするなの。このときIP Addressが``127.0.0.1`` でポート番号が ``5555`` であることを確認しろなの。もしこの値でない場合はメモしておくなの。  
+
+<img src="imgsrc/emu_setting.png" width="500">
+
+次いでに設定で解像度をHFD(1920x1080)にしておくなの。  
+
+<img src="imgsrc/emu_fhd.png" width="500">  
+
+ついでに [SDK Platform-Tools](https://developer.android.com/studio/releases/platform-tools) もダウンロードしておくなの。Windows版を選んでダウンロードするなの。  
+
+ダウンロードしたら解答して中にある ```adb.exe``` を ```df_macro.exe``` のあるフォルダにコピーしろなの。  
+
+<img src="imgsrc/copy.png" width="500">
+
+お疲れさまなの。  
+
+# 後方支援のポーリングをする方法なの。
+
+ホーム画面にしておくなのね。  
+
+次に ```df_macro.exe``` をダブルクリックで起動するの。  
+
+するとシェルが立ち上がってカスタムされたadb使うか？って聞いてくるから ``n`` を入力してエンターをおすなの。もし, ``nox`` を使っているなら ``nox_install_path/nox_adb.exe`` を渡せば動くはずなの。  
 
 ```
-https://github.com/Sachi854/AndroidEmuMacro.git
+==========================
+Use custom adb path ? (y or n) : n
 ```
 
-以下のコマンドでパッケージの依存関係にあるパッケージをインストール.  
+次は adbサーバのアドレスが上でメモってっていったところで上の値と同じなら```y```をそうでないなら```n```を入力して次の欄にその値を入力するなの。  
 
 ```
-cd AndroidEmuMacro
-pip install -r requirements.txt
+==========================
+Use custom ip address and port ? (y or n) : n
 ```
 
-[SDK Platform-Tools](https://developer.android.com/studio/releases/platform-tools) をダウンロードして ``adb.exe`` のパスを通す.  
+そんでここで ```0-2``` なのか ```kohoshien``` なのか聞いてくるから今回は ```kh``` って入力するなの
 
-エミュレータの設定からADBを有効にする.    
-
-次に``android_emu_macro.py`` と ``adb_wrapper.py``, ``object_detection.py`` を自分のプロジェクトのフォルダに以下の配置になるようコピー.  
-
-```dir
-your_project_dir
-  ├── adb_wrapper.py
-  ├── android_emu_macro.py
-  ├── object_detection.py
-  └── your_sourcecode.py
+```
+==========================
+02 or kohoshien? (02 or kh) : kh
 ```
 
-以下のようにコードを書く.  
+すると勝手に待ち受けてくれるなの。べんりなの。  
 
-```python
-from android_emu_macro import AndroidEmuMacro
+終了するときは ctrl + c をおすなの。  
 
-if __name__ == '__main__':
-    # create inctance
-    aem = AndroidEmuMacro()
-    # connect emulator
-    aem.connect()
-    aem.sleep(2)
+# 0-2を周回する方法なのなの。
 
-    # tap display
-    aem.tap(200,400)    
+はじめに0-2に出撃しアタッカーに補給, 戦闘せずにもどるなの。そうすることで戦闘を選択した際に以下のように0-2が表示されるようにするなの。これやらないとバグるなの。
 
-    # disconnect emulator
-    aem.disconnect()
+<img src="imgsrc/02.png" width="500">
+
+そしたら陣形編集から部隊設定に行って0-2用の陣形で部隊1に片方のアタッカーを割り当てたもの部隊2に残ったアタッカーものの設定を保存するなの。
+
+<img src="imgsrc/ef_.png" width="500">
+
+<img src="imgsrc/ef_set.png" width="500">
+
+陣形設定が終わったら部隊編成に行って部隊1に先ほどつくった設定1を割り当てて部隊2に**補給済み**の設定2のアタッカーを配置するの。 これ間違うとバグるから気を付けるなの。  
+
+<img src="imgsrc/ef1.png" width="500">
+
+<img src="imgsrc/ef2.png" width="500">
+
+そしたら次に ```df_macro.exe``` を起動して指示をみて ```n``` or ```y``` を入力するの。  
+
+そんで ```0-2``` なのか ```kohoshien``` なのか聞きかれたら今回は ```02``` って入力するなの
+
+```
+==========================
+02 or kohoshien? (02 or kh) : 02
 ```
 
-実行する.  
+すると勝手に周回してくれるなの。べんりなの。  
 
-# Usage
+終了するときは ctrl + c をおすなの。  
 
-```python
-def __init__(self, adb_path="adb.exe", save_img_path="./imgs"):
-    """
-    コンストラクタ
+# License  
 
-    Parameters:
-    ----------
-    adb_path : str 
-        adbのパス
-    save_img_pat : str
-        一時的に画像を保管したりするディレクトリのパス
-    """
-    pass
+ライセンスは [LICENSE](https://github.com/Sachi854/AndroidEmuMacro/blob/master/LICENSE) をよめなの。MIT Licenseなの。
 
+# どうでもいいはなし  
 
-def connect(self, device_address="localhost", device_port=5555) -> None:
-    """
-    ADBサーバに接続
-    
-    Parameters:
-    ----------
-    device_address : str
-        エミュレータの設定から確認できる ADBサーバのip address
-    device_port : str
-        エミュレータの設定から確認できる ADBサーバのポート番号
-    """
-    pass
-    
+個人的には Do What The Fuck You Want To Public License がこの世の中で一番すきなの。 この適当さがたまらないなの。  
 
-def disconnect(self) -> None:
-    """
-    ADBサーバから切断
-    """
-    pass
-
-
-def restart(self) -> None:
-    """
-    ADBサーバを再起動
-    """
-    pass
-
-
-def match_feature(self, train_img_path: str, threshold=4, sample_num=20, ratio=0.5, save_img=False) -> list:
-    """
-    画面と画像をマッチングしその座標を返す
-    アルゴリズムは特徴量検出
-    曖昧な画像検出向け
-    
-    Parameters:
-    ----------
-    train_img_path : str
-        入力画像のパス 
-    threshold : int
-        マッチ数の下限
-    sample_num : int
-        使用するサンプル数
-    ratio : float
-        ratioテストに使用するパラメータ
-    save_img : bool
-        マッチした画像を保存するかどうか
-    
-    Returns:
-    ----------
-    list
-        [is_match: Bool, [x: int, y: int]]
-    """
-    pass
-
-
-def match_template(self, train_img_path: str, threshold=0.8, save_img=False) -> list:
-    """
-    画面と画像をマッチングしその座標を返す
-    アルゴリズムはテンプレートマッチング
-    ピクセル単位での正確なマッチング
-    
-    Parameters:
-    ----------
-    train_img_path : str
-        入力画像のパス 
-    threshold : float
-        マッチングの精度(0~1.0)
-    save_img : bool
-        マッチした画像を保存するかどうか
-    
-    Returns:
-    ----------
-    list
-        [is_match: Bool, [x: int, y: int]]
-    """
-    pass
-
-
-def match(self, train_img_path: str, save_img=False) -> list:
-    """
-    画面と画像をマッチングしその座標を返す
-    テンプレートを優先でダメらな特徴量でマッチングさせる
-    
-    Parameters:
-    ----------
-    train_img_path : str
-        入力画像のパス  
-    save_img : bool
-        マッチした画像を保存するかどうか
-    
-    Returns:
-    ----------
-    list
-        [is_match: Bool, [x: int, y: int]]
-    """
-    pass
-
-
-def is_there_img(self, train_img_path: str, mode=0, save_img=False) -> bool:
-    """
-    画面にその画像があるか判定
-    
-    Parameters:
-    ----------
-    train_img_path : str
-        入力画像のパス  
-    mode : int
-        0 -> テンプレートマッチングと特徴量のどっちも, 1 -> テンプレートのみ,2 -> 特徴量のみ
-    save_img : bool
-        マッチした画像を保存するかどうか
-    
-    Returns:
-    ----------
-    bool
-    """
-    pass
-
-
-def tap_img(self, train_img_path: str, mode=0, save_img=False) -> bool:
-    """
-    画面内にその画像があればタップ
-    
-    Parameters:
-    ----------
-    train_img_path : str 
-        入力画像のパス  
-    mode : int
-        0 -> テンプレートマッチングと特徴量のどっちも, 1 -> テンプレートのみ,2 -> 特徴量のみ
-    save_img : bool
-        マッチした画像を保存するかどうか
-    
-    Returns:
-    ----------
-    bool
-    """
-    pass
-
- 
-def long_tap_img(self, train_img_path: str, m_sec=500, mode=0, save_img=False) -> bool:
-    """
-    画面内にその画像があればロングタップ
-    
-    Parameters:
-    ----------
-    train_img_path : str 
-        入力画像のパス  
-    mode : int
-        0 -> テンプレートマッチングと特徴量のどっちも, 1 -> テンプレートのみ,2 -> 特徴量のみ
-    save_img : bool
-        マッチした画像を保存するかどうか
-    
-    Returns:
-    ----------
-    bool
-    """
-    pass
-
-
-def swipe_img(self, train_img_path: str, x2: int, y2: int, m_sec=500, mode=0, save_img=False) -> bool:
-    """
-    画面内にその画像があれば指定位置までスワイプ
-    
-    Parameters:
-    ----------
-    train_img_path : int
-        入力画像のパス  
-    x2 : int
-        x軸ターゲット座標
-    y2 : int
-        y軸ターゲット座標
-    m_sec : int
-        スワイプにかかる時間をミリ秒で指定
-    mode : int
-        0 -> テンプレートマッチングと特徴量のどっちも, 1 -> テンプレートのみ,2 -> 特徴量のみ
-    save_img : bool
-        マッチした画像を保存するかどうか
-
-    Returns:
-    ----------
-    bool
-    """
-    pass
-
-
-def tap(self, x: int, y: int) -> None:
-    """
-    入力位置をタップ
-    
-    Parameters:
-    ----------
-    x : int
-        x軸ターゲット座標
-    y : int
-        y軸ターゲット座標
-    save_img : str
-        マッチした画像を保存するかどうか
-    """
-    pass
-
-
-def long_tap(self, x: int, y: int, m_sec=500) -> None:
-    """
-    入力位置をロングタップ
-    
-    Parameters:
-    ----------
-    x : int
-        x軸ターゲット座標
-    y : int
-        y軸ターゲット座標
-    save_img : str
-        マッチした画像を保存するかどうか
-    """
-    pass
-
-
-def swipe(self, x1: int, y1: int, x2: int, y2: int, m_sec=500) -> None:
-    """
-    入力位置をターゲット位置までスワイプ
-    
-    Parameters:
-    ----------
-    x1 : int
-        x軸入力座標
-    y1 : int
-        y軸入力座標
-    x2 : int
-        x軸ターゲット座標
-    y2 : int
-        y軸ターゲット座標
-    m_sec : int
-        スワイプにかかる時間をミリ秒で指定
-    """
-    pass
-
-def sleep(sec: float) -> None:
-    """
-    スリープ
-    
-    Parameters:
-    ----------
-    sec : float
-        秒
-    """
-    pass    
-
-
-def sleep_ms(m_sec: float) -> None:
-    """
-    スリープ
-    
-    Parameters:
-    ----------
-    m_sec : float
-        ミリ秒
-    """
-    pass
-
-
-def screenshot(self, offset=1) -> None:
-    """
-    スクリーンショットを撮る
-    
-    Parameters:
-    ----------
-    offset : int
-        セーブ画像の背中につく番号
-    """
-    pass
-```
-
-# Version
-
-0.1 : プロトタイプのリリース -> (2020/12/31)
-
-# License
-
-MIT License  
-
-# おまけ
-
-ドルフロ用マクロの使い方. 後で別のリポジトリに移す予定.  
-
-*これ使って何らかの損害を被った場合, 一切責任を負いません(ライセンスにも明記されてます)*
-
-## Download
-
-リリースページからダウンロード
-
-## 使い方
-
-付属の``README.md``を読むこと
+これをもし超絶エンジニアの先輩がコードも読んでくれて面倒見のいい超絶神な方ならぜひフィードバックをお願いしたいの...
