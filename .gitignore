@@ -3,3 +3,5 @@ imgs
 __pycache__
 .idea
 trash
+df_macro.spec
+build
