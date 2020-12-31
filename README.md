@@ -6,9 +6,9 @@
 
 # インストール方法。なの。  
 
-このREADME.mdを読んでいるならもちろんバイナリファイルはダウンロードできてるなのね。  
+バイナリは [ここ](https://github.com/Sachi854/AndroidEmuMacro/releases/tag/v0.1) にあるから適宜ダウンロードして適当な所に解凍するなの。   
 
-まずは適当なアンドロイドエミュレータをインストールするなの。おすすめは [MSI APP PLAYER](https://www.msi.com/Landing/appplayer) と [BlueStacks](www.bluestacks.com) なの。 どちらもIntelとかMicrosoftあたりから支援金もらってるレベルには信頼できるから安心しろなの。 (てかどっちもBlueStacks製なの...)  
+したらは適当なアンドロイドエミュレータをインストールするなの。おすすめは [MSI APP PLAYER](https://www.msi.com/Landing/appplayer) と [BlueStacks](www.bluestacks.com) なの。 どちらもIntelとかMicrosoftあたりから支援金もらってるレベルには信頼できるから安心しろなの。 (てかどっちもBlueStacks製なの...)  
 
 次にエミュレータになにかをインストールして動くことを確認するなの。当たり前なの。  
 
