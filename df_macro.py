@@ -566,32 +566,75 @@ def start_02_loop(aem: AndroidEmuMacro, is_ef1=True) -> bool:
     return True
 
 
+# これは自動待ち受け
+def start_logistic_support_loop(aem: AndroidEmuMacro) -> bool:
+    ct = 0
+    while True:
+        if check_logistic_support(aem):
+            print("遠征:" + str(ct) + '回目 お" 疲" れ" さ" ま" に" ゃ" ぁ" ぁ" ぁ" ぁ" ぁ"～')
+            ct = ct + 1
+        aem.sleep(120)
+
+
 # TODO 例外を投げるコードに変更したほうがいいと思われる
 # TODO 日付変更のに対応するコードを追加したほうがいいかも
 if __name__ == '__main__':
     is_ef1 = True
     print("==========================")
-    print("補給したアタッカーを2部隊に配置しましたか？")
-    print("周回開始時編成配置を入力してください")
-    s = input("部隊1 -> 1, 部隊2 -> 2 :: ")
-    if s == "2":
-        is_ef1 = not is_ef1
+    ss = input("Use custom adb path ? (y or n) : ")
+    flg1 = ss == "y"
+    if flg1:
+        adb_path = input("adb path : ")
+    else:
+        print("Ohagi!!")
+
+    print("==========================")
+    ss = input("Use custom ip address and port ? (y or n) : ")
+    flg2 = ss == "y"
+    if flg2:
+        i = input("IP Address  : ")
+        p = input("Port number :")
+    else:
+        print("Ok, use localhost and 5555")
 
     # init
     ###################################
-    aem = AndroidEmuMacro()
-    aem.connect()
-    aem.sleep(2)
-    print("==========================")
-    print("周回を開始 : 停止 -> ctrl^c")
-    print("==========================")
+    if flg1:
+        aem = AndroidEmuMacro(adb_path)
+    else:
+        aem = AndroidEmuMacro("./adb.exe")
 
-    # loop
-    start_02_loop(aem, is_ef1)
+    if flg2:
+        aem.connect(i, p)
+    else:
+        aem.connect()
+
+    aem.sleep(2)
+
+    print("==========================")
+    sss = input("02 or kohoshien? (02 or kh) : ")
+
+    if sss == "kh":
+        print("==========================")
+        print("後方支援\n待ち受け開始 : 停止 -> ctrl^c")
+        print("==========================")
+        start_logistic_support_loop(aem)
+    else:
+        # loop
+        print("==========================")
+        print("補給したアタッカーを2部隊に配置しましたか？")
+        print("周回開始時編成配置を入力してください")
+        s = input("部隊1 -> 1, 部隊2 -> 2 :: ")
+        if s == "2":
+            is_ef1 = not is_ef1
+        print("==========================")
+        print("周回を開始 : 停止 -> ctrl^c")
+        print("==========================")
+        start_02_loop(aem, is_ef1)
 
     # destruct
     ###################################
     aem.disconnect()
     print("==========================")
-    print("周回を終了")
+    print("終了")
     print("==========================")
