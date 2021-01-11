@@ -1,3 +1,5 @@
+import sys
+
 from android_emu_macro import AndroidEmuMacro
 import random
 import cv2
@@ -579,58 +581,59 @@ def start_logistic_support_loop(aem: AndroidEmuMacro) -> bool:
 # TODO 例外を投げるコードに変更したほうがいいと思われる
 # TODO 日付変更のに対応するコードを追加したほうがいいかも
 if __name__ == '__main__':
-    is_ef1 = True
-    print("==========================")
-    ss = input("Use custom adb path ? (y or n) : ")
-    flg1 = ss == "y"
-    if flg1:
-        adb_path = input("adb path : ")
-    else:
-        print("Ohagi!!")
+    args = sys.argv
 
-    print("==========================")
-    ss = input("Use custom ip address and port ? (y or n) : ")
-    flg2 = ss == "y"
-    if flg2:
-        i = input("IP Address  : ")
-        p = input("Port number :")
-    else:
-        print("Ok, use localhost and 5555")
+    ip = "localhost"
+    port = "5555"
+    adb = "adb"
+    mode = []
 
-    # init
-    ###################################
-    if flg1:
-        aem = AndroidEmuMacro(adb_path)
-    else:
-        aem = AndroidEmuMacro("./adb.exe")
+    # Parse command line arguments
+    for i, arg in enumerate(args, 0):
+        if arg == "-h":
+            print("Usage: df_macro.exe -m mode[:option] [options]...")
+            print("")
+            print("-h                   show this help")
+            print("-m    mode[:option]  set mode,")
+            print("                         kh          kohoshien ")
+            print("				            02[:ehelon] do 02")
+            print("-abd  adb-path       location of the adb executable file")
+            print("-ip   ip-address     ip address of adb saver")
+            print("-port port-number    port number of adb server")
+            print("")
+            exit()
+        elif arg == "-m":
+            mode = args[i + 1].split(":")
+        elif arg == "-adb":
+            adb = args[i + 1]
+        elif arg == "-ip":
+            ip == args[i + 1]
+        elif arg == "-port":
+            port == args[i + 1]
+        else:
+            pass
 
-    if flg2:
-        aem.connect(i, p)
-    else:
-        aem.connect()
-
+    aem = AndroidEmuMacro(adb)
+    aem.connect(ip, port)
     aem.sleep(2)
 
-    print("==========================")
-    sss = input("02 or kohoshien? (02 or kh) : ")
-
-    if sss == "kh":
+    if mode[0] == "kh":
         print("==========================")
         print("後方支援\n待ち受け開始 : 停止 -> ctrl^c")
         print("==========================")
         start_logistic_support_loop(aem)
-    else:
+    elif mode[0] == "02":
         # loop
-        print("==========================")
-        print("補給したアタッカーを2部隊に配置しましたか？")
-        print("周回開始時編成配置を入力してください")
-        s = input("部隊1 -> 1, 部隊2 -> 2 :: ")
-        if s == "2":
-            is_ef1 = not is_ef1
         print("==========================")
         print("周回を開始 : 停止 -> ctrl^c")
         print("==========================")
+        is_ef1 = True
+        for itr in mode[0:]:
+            if itr == "2":
+                is_ef1 = not is_ef1
         start_02_loop(aem, is_ef1)
+    else:
+        pass
 
     # destruct
     ###################################
