@@ -23,24 +23,22 @@ pip install -r requirements.txt
 
 エミュレータの設定からADBを有効にする.    
 
-次に``android_emu_macro.py`` と ``adb_wrapper.py``, ``object_detection.py`` を自分のプロジェクトのフォルダに以下の配置になるようコピー.  
+次に``aem`` を自分のプロジェクトのフォルダに以下の配置になるようコピー.  
 
 ```dir
 your_project_dir
-  ├── adb_wrapper.py
-  ├── android_emu_macro.py
-  ├── object_detection.py
+  ├── aem
   └── your_sourcecode.py
 ```
 
 以下のようにコードを書く.  
 
 ```python
-from android_emu_macro import AndroidEmuMacro
+import aem
 
 if __name__ == '__main__':
     # create inctance
-    aem = AndroidEmuMacro()
+    aem = aem.AndroidEmuMacro()
     # connect emulator
     aem.connect()
     aem.sleep(2)

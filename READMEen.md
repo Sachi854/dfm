@@ -24,24 +24,22 @@ Download [SDK Platform-Tools](https://developer.android.com/studio/releases/plat
 
 Enable adb of emulator from setting.  
 
-Next, copy ``android_emu_macro.py`` and ``adb_wrapper.py``, ``object_detection.py`` to your project directory as shown below.  
+Next, copy ``aem`` to your project directory as shown below.  
 
 ```dir
 your_project_dir
-  ├── adb_wrapper.py
-  ├── android_emu_macro.py
-  ├── object_detection.py
+  ├── aem 
   └── your_sourcecode.py
 ```
 
 Try, as shown below.  
 
 ```python
-from android_emu_macro import AndroidEmuMacro
+import aem
 
 if __name__ == '__main__':
     # create instance
-    aem = AndroidEmuMacro()
+    aem = aem.AndroidEmuMacro()
     # connect emulator
     aem.connect()
     aem.sleep(2)
