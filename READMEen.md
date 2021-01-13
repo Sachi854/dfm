@@ -338,7 +338,8 @@ def screenshot(self, offset=1) -> None:
 
 # Version
 
-0.1 : Prototype released. -> (2020/12/31)
+0.1 : Prototype released. -> (2020/12/31)  
+0.2 : Packaging.          -> (2021/01/14)
 
 # License
 
