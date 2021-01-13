@@ -17,6 +17,7 @@ Because, you need to install these package as shown below.
 
 ```
 cd AndroidEmuMacro
+python ./setup.py install
 pip install -r requirements.txt
 ```
 
@@ -25,12 +26,6 @@ Download [SDK Platform-Tools](https://developer.android.com/studio/releases/plat
 Enable adb of emulator from setting.  
 
 Next, copy ``aem`` to your project directory as shown below.  
-
-```dir
-your_project_dir
-  ├── aem 
-  └── your_sourcecode.py
-```
 
 Try, as shown below.  
 

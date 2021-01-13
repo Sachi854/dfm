@@ -16,20 +16,13 @@ https://github.com/Sachi854/AndroidEmuMacro.git
 
 ```
 cd AndroidEmuMacro
+python ./setup.py install
 pip install -r requirements.txt
 ```
 
 [SDK Platform-Tools](https://developer.android.com/studio/releases/platform-tools) をダウンロードして ``adb.exe`` のパスを通す.  
 
 エミュレータの設定からADBを有効にする.    
-
-次に``aem`` を自分のプロジェクトのフォルダに以下の配置になるようコピー.  
-
-```dir
-your_project_dir
-  ├── aem
-  └── your_sourcecode.py
-```
 
 以下のようにコードを書く.  
 
