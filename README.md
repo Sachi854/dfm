@@ -16,6 +16,7 @@ https://github.com/Sachi854/AndroidEmuMacro.git
 
 ```
 cd AndroidEmuMacro
+python ./setup.py install
 pip install -r requirements.txt
 ```
 
@@ -23,24 +24,14 @@ pip install -r requirements.txt
 
 エミュレータの設定からADBを有効にする.    
 
-次に``android_emu_macro.py`` と ``adb_wrapper.py``, ``object_detection.py`` を自分のプロジェクトのフォルダに以下の配置になるようコピー.  
-
-```dir
-your_project_dir
-  ├── adb_wrapper.py
-  ├── android_emu_macro.py
-  ├── object_detection.py
-  └── your_sourcecode.py
-```
-
 以下のようにコードを書く.  
 
 ```python
-from android_emu_macro import AndroidEmuMacro
+import aem
 
 if __name__ == '__main__':
     # create inctance
-    aem = AndroidEmuMacro()
+    aem = aem.AndroidEmuMacro()
     # connect emulator
     aem.connect()
     aem.sleep(2)
@@ -344,7 +335,8 @@ def screenshot(self, offset=1) -> None:
 
 # Version
 
-0.1 : プロトタイプのリリース -> (2020/12/31)
+0.1 : プロトタイプのリリース -> (2020/12/31)  
+0.2 : パッケージ化          -> (2021/01/14)
 
 # License
 

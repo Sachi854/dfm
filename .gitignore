@@ -5,3 +5,7 @@ __pycache__
 trash
 df_macro.spec
 build
+venv
+build
+aem.egg-info
+dist
