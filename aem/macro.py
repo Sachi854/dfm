@@ -1,5 +1,5 @@
-from adb_wrapper import AdbWrapper
-from object_detection import ObjectDetection
+from aem.wrapper.adb import AdbWrapper
+from aem.analysis.od import ObjectDetection
 
 import os
 import time

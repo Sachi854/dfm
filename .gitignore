@@ -3,6 +3,9 @@ imgs
 __pycache__
 .idea
 trash
-build
-df_mucro_v0.2a
 df_macro.spec
+build
+venv
+build
+aem.egg-info
+dist
