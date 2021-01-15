@@ -1,6 +1,6 @@
 import sys
 
-from android_emu_macro import AndroidEmuMacro
+from aem import AndroidEmuMacro
 import random
 import cv2
 import numpy as np
@@ -333,13 +333,13 @@ def __repair_in_field(aem: AndroidEmuMacro) -> bool:
 # たぶんうごく
 # マルチメニューをひらく
 def __open_multi_menu(aem: AndroidEmuMacro) -> bool:
-    return aem.tap_img("df_img/multi_menu.png")
+    return aem.tap_img("df_img/ov.png")
 
 
 # うごく
 # マルチメニューからデータルームに飛ぶ
 def __go_m2dataroom(aem: AndroidEmuMacro) -> bool:
-    return aem.tap_img("df_img/mm_dr.png")
+    return aem.tap_img("df_img/ov_dr.png")
 
 
 # いちおううごく
@@ -347,7 +347,7 @@ def __go_m2dataroom(aem: AndroidEmuMacro) -> bool:
 def __return_base(aem: AndroidEmuMacro) -> bool:
     if __open_multi_menu(aem):
         aem.sleep(load_medium)
-        return aem.tap_img("df_img/return_base_adv.png")
+        return aem.tap_img("df_img/ov_base.png")
     return False
 
 

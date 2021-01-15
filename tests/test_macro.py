@@ -1,17 +1,14 @@
 from unittest import TestCase
-import aem
+from aem import AndroidEmuMacro
 
 
 class TestAndroidEmuMacro(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls._aem = aem.AndroidEmuMacro()
-        cls._aem.connect()
+    def setUp(self) -> None:
+        self._aem = AndroidEmuMacro()
+        self._aem.connect()
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls._aem.disconnect()
+    def tearDown(self) -> None:
+        self._aem.disconnect()
 
-    @classmethod
-    def test_screenshot(cls):
-        cls._aem.screenshot()
+    def test_screenshot(self):
+        self._aem.screenshot()
