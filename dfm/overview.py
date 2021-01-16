@@ -1,16 +1,10 @@
-import pathlib
-import os
-
 from aem import AndroidEmuMacro
+from dfm.tools import here
 
 OVERVIEW_DELAY = 1.0
 X_LEFT = 200
 X_RIGHT = 1700
 Y = 350
-
-
-def here(path: str) -> str:
-    return os.path.dirname(__file__) + "/" + path
 
 
 def is_overview_available(aem: AndroidEmuMacro) -> bool:
