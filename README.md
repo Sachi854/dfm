@@ -4,6 +4,14 @@
 
 # Quick start
 
+クローンとサブモジュールの同期
+
+```
+git clone https://github.com/Sachi854/dfm.git
+cd dfm
+git submodule update --init --recursive
+```
+
 仮想環境を作る&有効化
 
 ```bash
@@ -14,7 +22,6 @@ source venv/bin/activate
 AEMをインストール
 
 ```bash
-https://github.com/Sachi854/AndroidEmuMacro.git
 cd AndroidEmuMacro
 python ./setup.py install
 pip install -r requirements.txt

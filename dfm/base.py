@@ -16,7 +16,6 @@ def check_logistic_support(aem: AndroidEmuMacro) -> bool:
         aem.sleep(BASE_DELAY / 8)
         aem.tap(random.randrange(430, 440, 1), random.randrange(330, 340, 1))
         aem.sleep(BASE_DELAY / 4)
-        print(aem.match(here("df_img/b_cbt.png"))[0])
         if not aem.match(here("df_img/b_cbt.png"))[0]:
             aem.tap_img(here("df_img/b_ls_apply.png"))
         else:

@@ -1,0 +1,3 @@
+[submodule "AndroidEmuMacro"]
+	path = AndroidEmuMacro
+	url = https://github.com/Sachi854/AndroidEmuMacro.git
